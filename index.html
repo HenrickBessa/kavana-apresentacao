@@ -535,8 +535,8 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
       <div class="stats">
         <div class="stat reveal" style="--d:700"><b data-count="4">4</b><span>perfis de acesso: recepção, profissional, administração e paciente</span></div>
         <div class="stat reveal" style="--d:780"><b data-count="5">5</b><span>tipos de documento, numerados e com cópia arquivada</span></div>
-        <div class="stat reveal" style="--d:860"><b data-count="185">185</b><span>testes automáticos na API, rodados a cada etapa</span></div>
-        <div class="stat reveal" style="--d:940"><b data-count="101">101</b><span>verificações feitas nas telas, do site à área do paciente</span></div>
+        <div class="stat reveal" style="--d:860"><b data-count="193">193</b><span>testes automáticos na API, rodados a cada etapa</span></div>
+        <div class="stat reveal" style="--d:940"><b data-count="109">109</b><span>verificações feitas nas telas, do site à área do paciente</span></div>
       </div>
     </div>
   </div>
@@ -589,7 +589,7 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
           <figure class="shot bare" data-shot="nav-admin" data-alt="Menu da administração" style="--d:620"></figure>
         </div>
         <div class="role reveal" style="--d:700">
-          <div><h3>Paciente</h3><p>Os próprios atendimentos, documentos e dados, numa área separada, com entrada por CPF.</p></div>
+          <div><h3>Paciente</h3><p>Os próprios atendimentos e documentos, ou os dos filhos menores, numa área separada, com entrada por CPF.</p></div>
           <figure class="shot bare" data-shot="nav-paciente" data-alt="Menu da área do paciente" style="--d:760"></figure>
         </div>
       </div>
@@ -997,7 +997,7 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
       <div class="phones">
         <div class="item"><figure class="shot phone" data-shot="celular-site" data-alt="Site no celular"></figure><p class="caption">Site</p></div>
         <div class="item"><figure class="shot phone" data-shot="celular-agenda" data-alt="Agenda do dia no celular"></figure><p class="caption">Agenda do dia</p></div>
-        <div class="item"><figure class="shot phone" data-shot="celular-solicitacoes" data-alt="Solicitações do site no celular"></figure><p class="caption">Solicitações do site</p></div>
+        <div class="item"><figure class="shot phone" data-shot="celular-solicitacoes" data-alt="Solicitações no celular"></figure><p class="caption">Solicitações</p></div>
         <div class="item"><figure class="shot phone" data-shot="celular-prontuario" data-alt="Prontuário finalizado no celular"></figure><p class="caption">Prontuário</p></div>
         <div class="item"><figure class="shot phone" data-shot="celular-paciente" data-alt="Área do paciente no celular"></figure><p class="caption">Área do paciente</p></div>
       </div>
@@ -1525,13 +1525,13 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
 </section>
 
 <!-- =========================================================== ÁREA DO PACIENTE -->
-<section class="slide dark divider" id="cap-paciente" data-chapter="paciente" data-title="Área do paciente" data-summary="O paciente vê os próprios atendimentos e documentos, com o acesso criado pela recepção.">
+<section class="slide dark divider" id="cap-paciente" data-chapter="paciente" data-title="Área do paciente" data-summary="O paciente e o responsável legal acompanham atendimentos e documentos e pedem remarcação ou cancelamento, com o acesso criado pela recepção.">
   <div class="canvas">
     <span class="div-num reveal">06</span>
     <div class="div-text">
       <p class="eyebrow light reveal" style="--d:120">Capítulo 6</p>
       <h2 class="reveal" style="--d:220">Área do paciente</h2>
-      <p class="div-lead reveal" style="--d:320">O paciente vê os próprios atendimentos e documentos, com o acesso criado pela recepção.</p>
+      <p class="div-lead reveal" style="--d:320">O paciente e o responsável legal acompanham atendimentos e documentos e pedem remarcação ou cancelamento, com o acesso criado pela recepção.</p>
     </div>
     <ol class="div-list" data-chapter-list="paciente"></ol>
     <img class="div-tree" src="img/brand-tree-mark.webp" alt="" data-overflow-ok>
@@ -1548,14 +1548,37 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
     <div class="body split" style="--tw:470px">
       <div class="side">
         <ol class="legend sm">
-          <li data-mark="1"><p><strong>Senha provisória</strong> mostrada uma vez, para entregar ao paciente.</p></li>
+          <li data-mark="1"><p><strong>Senha provisória</strong> mostrada uma vez, válida por 7 dias.</p></li>
           <li data-mark="2"><p><strong>Convite pelo WhatsApp</strong> com o link e a senha, sem o CPF: uma mensagem no número errado não abre nada sozinha.</p></li>
           <li data-mark="3"><p><strong>Nova senha provisória</strong> quando o paciente esquecer a dele; as sessões abertas terminam.</p></li>
           <li data-mark="4"><p><strong>Desativar</strong> o acesso a qualquer momento.</p></li>
         </ol>
-        <p class="note">Por enquanto, só para maiores de idade com CPF no cadastro. O acesso do responsável legal vem numa próxima etapa.</p>
+        <p class="note">Na ficha de um menor de idade, o acesso criado é o do responsável legal, no próximo slide.</p>
       </div>
       <figure class="shot" data-shot="recepcao-acesso-paciente" data-path="kavana · sistema · pacientes" data-alt="Cartão Área do paciente na ficha" style="--fw:640px"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="paciente-responsavel" data-chapter="paciente" data-title="O responsável legal">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Área do paciente · Menores de idade</p>
+      <h2 class="reveal" style="--d:80">O responsável legal</h2>
+      <p class="lead reveal" style="--d:160">Na ficha de um menor, o acesso é do responsável, que entra com o próprio CPF.</p>
+    </header>
+    <div class="body stack">
+      <div class="duo">
+        <figure class="shot" data-shot="recepcao-acesso-responsavel" data-path="kavana · sistema · pacientes" data-alt="Acesso do responsável na ficha da criança"></figure>
+        <figure class="shot" data-shot="responsavel-inicio" data-path="kavana · área do paciente" data-frame="1280/800" data-alt="Início da área do paciente para o responsável" style="--d:420"></figure>
+      </div>
+      <ol class="legend cols sm">
+        <li data-shot="recepcao-acesso-responsavel" data-mark="1"><p><strong>O acesso é do responsável</strong> registrado no cadastro da criança.</p></li>
+        <li data-shot="responsavel-inicio" data-mark="1"><p><strong>Um acesso por CPF</strong>: os filhos e, se a pessoa também for paciente, a própria ficha.</p></li>
+        <li data-shot="recepcao-acesso-responsavel" data-mark="2"><p><strong>Convite pelo WhatsApp</strong> no telefone do responsável.</p></li>
+        <li data-shot="responsavel-inicio" data-mark="2"><p><strong>Cada item diz de quem é</strong>, com o nome da criança.</p></li>
+      </ol>
+      <p class="note">Adolescentes (12 a 17 anos): o responsável vê os atendimentos e os documentos sem conteúdo clínico, pelo sigilo do adolescente. Aos 18 anos, ou com outro responsável no cadastro, o acesso termina sozinho.</p>
     </div>
   </div>
 </section>
@@ -1594,7 +1617,7 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
         <ol class="legend">
           <li data-mark="1"><p><strong>Próximos atendimentos</strong>, com profissional, modalidade e situação.</p></li>
           <li data-mark="2"><p><strong>Documentos recentes</strong>, prontos para abrir.</p></li>
-          <li data-mark="3"><p><strong>Remarcar ou cancelar</strong> continua com a recepção, pelo WhatsApp.</p></li>
+          <li data-mark="3"><p><strong>Falar com a recepção</strong> pelo WhatsApp, para outros assuntos.</p></li>
         </ol>
       </div>
       <figure class="shot" data-shot="paciente-inicio" data-path="kavana · área do paciente" data-frame="1280/800" data-alt="Início da área do paciente"></figure>
@@ -1614,10 +1637,33 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
         <ol class="legend">
           <li data-mark="1"><p><strong>Próximos</strong>: confirmado ou agendado.</p></li>
           <li data-mark="2"><p><strong>Anteriores</strong>: compareceu, faltou ou cancelado, com o valor e se foi pago.</p></li>
+          <li data-mark="3"><p><strong>Pedir remarcação ou cancelamento</strong> no próprio atendimento.</p></li>
         </ol>
         <p class="note">Nenhum conteúdo clínico aqui: só data, profissional, modalidade, situação e pagamento.</p>
       </div>
       <figure class="shot" data-shot="paciente-atendimentos" data-path="kavana · área do paciente · atendimentos" data-frame="1280/800" data-alt="Atendimentos do paciente"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="paciente-pedidos" data-chapter="paciente" data-title="Pedir remarcação ou cancelamento">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Área do paciente · Recepção</p>
+      <h2 class="reveal" style="--d:80">Pedir remarcação ou cancelamento</h2>
+      <p class="lead reveal" style="--d:160">O pedido sai do próprio atendimento e chega à recepção, que confirma com a pessoa. Nada muda na agenda sozinho.</p>
+    </header>
+    <div class="body stack">
+      <div class="duo">
+        <figure class="shot" data-shot="paciente-pedido" data-path="kavana · área do paciente · atendimentos" data-alt="Pedido de remarcação na área do paciente"></figure>
+        <figure class="shot" data-shot="recepcao-pedido-paciente" data-path="kavana · sistema · solicitações" data-alt="Pedido da área do paciente na tela Solicitações" style="--d:420"></figure>
+      </div>
+      <ol class="legend cols sm">
+        <li data-shot="paciente-pedido" data-mark="1"><p><strong>Melhores dias e horários</strong>, ou o motivo, se a pessoa quiser. Informação de saúde não vai aqui.</p></li>
+        <li data-shot="recepcao-pedido-paciente" data-mark="1"><p><strong>Quem pediu</strong>: o paciente ou o responsável, com o telefone.</p></li>
+        <li data-shot="paciente-pedido" data-mark="3"><p><strong>Um pedido por atendimento</strong>; a área mostra que ele está com a recepção.</p></li>
+        <li data-shot="recepcao-pedido-paciente" data-mark="3"><p><strong>Remarcar ou cancelar na agenda</strong> encerra o pedido sozinho.</p></li>
+      </ol>
     </div>
   </div>
 </section>
@@ -1637,7 +1683,7 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
       <ul class="facts" style="margin-top:0">
         <li>Imprime ou salva em PDF pelo navegador, com número e selo de integridade.</li>
         <li>Cada documento aberto entra na <strong>auditoria</strong>, com o nome do paciente.</li>
-        <li>O paciente só alcança os próprios documentos: o de outra pessoa responde como se não existisse.</li>
+        <li>Cada um alcança só os próprios documentos, ou os dos filhos menores: o de outra pessoa responde como se não existisse.</li>
       </ul>
     </div>
   </div>
@@ -1698,7 +1744,7 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
         <table>
           <thead><tr><th></th><th data-col="r">Recepção</th><th data-col="m">Médico(a)</th><th data-col="p">Psicólogo(a)</th><th data-col="t">Terapeuta</th><th data-col="a">Administração</th><th data-col="x">Paciente</th></tr></thead>
           <tbody>
-            <tr><th>Agenda</th><td class="y" data-col="r"><i>✓</i>Todas; marca e altera</td><td class="p" data-col="m">A própria</td><td class="p" data-col="p">A própria</td><td class="p" data-col="t">A própria</td><td class="y" data-col="a"><i>✓</i>Todas; marca e altera</td><td class="p" data-col="x">Os próprios atendimentos</td></tr>
+            <tr><th>Agenda</th><td class="y" data-col="r"><i>✓</i>Todas; marca e altera</td><td class="p" data-col="m">A própria</td><td class="p" data-col="p">A própria</td><td class="p" data-col="t">A própria</td><td class="y" data-col="a"><i>✓</i>Todas; marca e altera</td><td class="p" data-col="x">Os próprios; pede remarcação</td></tr>
             <tr><th>Pedidos do site</th><td class="y" data-col="r"><i>✓</i>Responde</td><td class="n" data-col="m">—</td><td class="n" data-col="p">—</td><td class="n" data-col="t">—</td><td class="y" data-col="a"><i>✓</i>Responde</td><td class="n" data-col="x">—</td></tr>
             <tr><th>Cadastro do paciente</th><td class="y" data-col="r"><i>✓</i>Todos</td><td class="p" data-col="m">Os próprios pacientes</td><td class="p" data-col="p">Os próprios pacientes</td><td class="p" data-col="t">Os próprios pacientes</td><td class="y" data-col="a"><i>✓</i>Todos</td><td class="p" data-col="x">Os próprios dados, só leitura</td></tr>
             <tr><th>Prontuário: parte compartilhada</th><td class="n" data-col="r">—</td><td class="p" data-col="m">Dos próprios pacientes</td><td class="p" data-col="p">Dos próprios pacientes</td><td class="p" data-col="t">Dos próprios pacientes</td><td class="p" data-col="a">Lê, com auditoria</td><td class="n" data-col="x">—</td></tr>
@@ -1798,8 +1844,8 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
     <div class="body">
       <div class="stats" style="margin-top:0">
         <div class="stat reveal" style="--d:260"><b data-count="12">12</b><span>etapas entregues, do diagnóstico à área do paciente</span></div>
-        <div class="stat reveal" style="--d:340"><b data-count="185">185</b><span>testes automáticos na API, com banco de verdade</span></div>
-        <div class="stat reveal" style="--d:420"><b data-count="101">101</b><span>verificações nas telas, como uma pessoa usaria</span></div>
+        <div class="stat reveal" style="--d:340"><b data-count="193">193</b><span>testes automáticos na API, com banco de verdade</span></div>
+        <div class="stat reveal" style="--d:420"><b data-count="109">109</b><span>verificações nas telas, como uma pessoa usaria</span></div>
         <div class="stat reveal" style="--d:500"><b data-count="0">0</b><span>erros no console nas telas verificadas</span></div>
       </div>
       <ul class="facts reveal" style="--d:620;margin-top:28px">
@@ -1857,7 +1903,7 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
         <article class="card reveal" style="--d:260"><span class="chip">P11</span><h3>Teleatendimento</h3><dl><div><dt>O que entra</dt><dd>Sala de vídeo por atendimento, link do paciente que expira, consentimento próprio e nada de gravação.</dd></div><div><dt>A clínica decide</dt><dd>O fornecedor de vídeo, quais profissões atendem online e a revisão do termo.</dd></div></dl></article>
         <article class="card reveal" style="--d:360"><span class="chip">P12</span><h3>Transcrição com apoio de IA</h3><dl><div><dt>O que entra</dt><dd>Desligada por padrão; o rascunho só entra no prontuário depois de o profissional aprovar, com a marca "apoio de IA".</dd></div><div><dt>A clínica decide</dt><dd>Se quer usar, com quais fornecedores e depois da revisão jurídica.</dd></div></dl></article>
         <article class="card reveal" style="--d:460"><span class="chip">P13</span><h3>Assinatura digital ICP-Brasil</h3><dl><div><dt>O que entra</dt><dd>Receita, atestado e documentos assinados digitalmente e verificáveis no ITI.</dd></div><div><dt>A clínica decide</dt><dd>O fornecedor do certificado em nuvem, onde guardar os PDFs assinados e o custo.</dd></div></dl></article>
-        <article class="card reveal" style="--d:560"><span class="chip">P14, parte 2</span><h3>Área do paciente: o que falta</h3><dl><div><dt>O que entra</dt><dd>Acesso do responsável legal, pedido de remarcação e de cancelamento pela área e, se a clínica quiser, pagamento online.</dd></div><div><dt>A clínica decide</dt><dd>O que o paciente pode fazer sozinho e, para pagar online, o processador e a política de reembolso.</dd></div></dl></article>
+        <article class="card reveal" style="--d:560"><span class="chip">Área do paciente</span><h3>Pagamento online</h3><dl><div><dt>O que entra</dt><dd>Pix e cartão pela área do paciente, com a confirmação chegando sozinha ao financeiro.</dd></div><div><dt>A clínica decide</dt><dd>Se quer cobrar online, o processador, quando cobrar e a política de cancelamento e reembolso.</dd></div></dl></article>
       </div>
     </div>
   </div>
@@ -1877,9 +1923,9 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
         <li class="reveal" style="--d:360"><b>3</b><div><strong>Textos-modelo</strong><span>Documentos e mensagens de WhatsApp estão com textos provisórios.</span></div></li>
         <li class="reveal" style="--d:420"><b>4</b><div><strong>Dados da equipe</strong><span>Registros nos conselhos e quais profissionais aceitam pedidos pelo site.</span></div></li>
         <li class="reveal" style="--d:480"><b>5</b><div><strong>Agendamento online</strong><span>Quando ligar o agendamento pelo site (hoje desligado, com WhatsApp).</span></div></li>
-        <li class="reveal" style="--d:540"><b>6</b><div><strong>Fornecedores</strong><span>Vídeo, IA e assinatura digital, para as próximas etapas.</span></div></li>
-        <li class="reveal" style="--d:600"><b>7</b><div><strong>Convite da área do paciente</strong><span>Hoje vai pelo WhatsApp com o link e a senha provisória, sem o CPF. Manter assim?</span></div></li>
-        <li class="reveal" style="--d:660"><b>8</b><div><strong>Pagamento online</strong><span>Se a clínica quiser: o processador, quando cobrar e a política de cancelamento e reembolso.</span></div></li>
+        <li class="reveal" style="--d:540"><b>6</b><div><strong>Fornecedores</strong><span>Vídeo, IA, assinatura digital e, se a clínica quiser, pagamento online (processador e reembolso).</span></div></li>
+        <li class="reveal" style="--d:600"><b>7</b><div><strong>Convite da área do paciente</strong><span>Vai pelo WhatsApp com o link e a senha provisória (válida por 7 dias), sem o CPF. Manter assim?</span></div></li>
+        <li class="reveal" style="--d:660"><b>8</b><div><strong>Adolescentes na área do paciente</strong><span>O responsável vê atendimentos e documentos sem conteúdo clínico, pelo sigilo do adolescente. Confirmar com o jurídico.</span></div></li>
       </ol>
     </div>
   </div>
