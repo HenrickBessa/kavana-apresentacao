@@ -1,6 +1,6 @@
 # Clínica Kavaná · Apresentação do sistema
 
-Apresentação interativa do sistema da Clínica Kavaná: site, agenda, prontuários, documentos, gestão e segurança.
+Apresentação interativa do sistema da Clínica Kavaná: site, agenda, prontuários, documentos, gestão, área do paciente e segurança.
 
 **Abrir:** https://henrickbessa.github.io/kavana-apresentacao/
 

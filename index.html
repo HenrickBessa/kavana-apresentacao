@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Kavaná · Apresentação do sistema</title>
 <meta name="robots" content="noindex, nofollow">
-<meta name="description" content="Apresentação interativa do sistema da Clínica Kavaná: site, agenda, prontuários, documentos, gestão e segurança. Telas reais com dados fictícios.">
+<meta name="description" content="Apresentação interativa do sistema da Clínica Kavaná: site, agenda, prontuários, documentos, gestão, área do paciente e segurança. Telas reais com dados fictícios.">
 <!--
   Apresentação do sistema da Clínica Kavaná (PF). Abra este arquivo no navegador: setas, espaço ou clique
   avançam; I abre o índice; F, tela cheia; ? mostra os atalhos.
@@ -143,6 +143,7 @@ strong{font-weight:600}
 .mark.badge-right b{left:auto;right:-15px}
 .mark.badge-top b{left:22px}
 .mark.badge-low b{top:4px}
+.mark.badge-end b{left:auto;right:-15px;top:auto;bottom:-15px}
 .mark.on{box-shadow:0 0 0 9999px var(--dim);z-index:3;scale:1.012}
 .mark.on b{background:var(--color-gold);color:var(--color-ink);animation:pulse 1.4s var(--ease-gentle) infinite}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 3px var(--color-surface),0 0 0 3px color-mix(in srgb,var(--color-gold) 70%,transparent)}50%{box-shadow:0 0 0 3px var(--color-surface),0 0 0 14px color-mix(in srgb,var(--color-gold) 0%,transparent)}}
@@ -221,12 +222,12 @@ strong{font-weight:600}
 .div-tree{position:absolute;right:-150px;bottom:-210px;width:620px;opacity:.06;pointer-events:none}
 
 /* ---------- Índice (slide 2) ---------- */
-.chapter-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;height:100%}
+.chapter-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:18px;height:100%}
 .chapter-card{position:relative;display:flex;flex-direction:column;padding:26px 24px;border-radius:var(--radius-card);background:var(--color-surface);box-shadow:var(--shadow-sm),0 0 0 1px var(--color-border);text-align:left;transition:translate .3s var(--ease-organic),box-shadow .3s}
 .chapter-card:hover{translate:0 -6px;box-shadow:var(--shadow-md),0 0 0 1px var(--color-gold-light)}
-.chapter-card .num{font:400 52px/1 var(--serif);color:var(--color-gold)}
-.chapter-card h3{font:500 26px/1.15 var(--serif);margin-top:14px;color:var(--color-ink)}
-.chapter-card p{font-size:16px;line-height:1.45;color:var(--color-ink-soft);margin-top:10px;flex:1}
+.chapter-card .num{font:400 46px/1 var(--serif);color:var(--color-gold)}
+.chapter-card h3{font:500 23px/1.15 var(--serif);margin-top:12px;color:var(--color-ink)}
+.chapter-card p{font-size:15px;line-height:1.45;color:var(--color-ink-soft);margin-top:10px;flex:1}
 .chapter-card small{margin-top:16px;font:600 13px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--color-gold-ink)}
 .chapter-card.intro{background:var(--color-footer-bg);box-shadow:none}
 .chapter-card.intro h3{color:var(--color-footer-title)}
@@ -271,7 +272,7 @@ strong{font-weight:600}
 .flow-rule strong{color:var(--color-footer-link)}
 
 /* ---------- Perfis ---------- */
-.roles{display:flex;flex-direction:column;gap:30px}
+.roles{display:flex;flex-direction:column;gap:18px}
 .role{display:grid;grid-template-columns:290px 1fr;gap:34px;align-items:center}
 .role h3{font:500 28px/1.15 var(--serif)}
 .role p{font-size:17px;line-height:1.45;color:var(--color-ink-soft);margin-top:8px}
@@ -324,21 +325,22 @@ strong{font-weight:600}
 @keyframes blink{50%{opacity:0}}
 
 /* ---------- Celular ---------- */
-.phones{display:flex;justify-content:center;gap:44px;align-items:flex-start}
-.phones figure{--pw:236px}
+.phones{display:flex;justify-content:center;gap:30px;align-items:flex-start}
+.phones figure{--pw:220px}
 .phones .item{display:flex;flex-direction:column;align-items:center}
 .phones .item:nth-child(even){margin-top:34px}
 .slide.active .phones .item:nth-child(1) .shot{animation:shot-in .95s var(--ease-organic) .25s both,float 7s ease-in-out 1.5s infinite}
 .slide.active .phones .item:nth-child(2) .shot{animation:shot-in .95s var(--ease-organic) .4s both,float 8s ease-in-out 1.8s infinite reverse}
 .slide.active .phones .item:nth-child(3) .shot{animation:shot-in .95s var(--ease-organic) .55s both,float 7.5s ease-in-out 2.1s infinite}
 .slide.active .phones .item:nth-child(4) .shot{animation:shot-in .95s var(--ease-organic) .7s both,float 8.5s ease-in-out 2.4s infinite reverse}
+.slide.active .phones .item:nth-child(5) .shot{animation:shot-in .95s var(--ease-organic) .85s both,float 7.2s ease-in-out 2.7s infinite}
 
 /* ---------- Quem vê o quê ---------- */
 .matrix{display:flex;flex-direction:column;gap:18px}
-.matrix table{width:100%;border-collapse:separate;border-spacing:0 6px;table-layout:fixed;font-size:16px}
+.matrix table{width:100%;border-collapse:separate;border-spacing:0 6px;table-layout:fixed;font-size:15px}
 .matrix th,.matrix td{padding:11px 12px;text-align:left;vertical-align:middle;transition:opacity .4s,background .4s}
 .matrix thead th{font:600 15px/1.2 var(--sans);color:var(--color-gold-ink);letter-spacing:.02em}
-.matrix thead th:first-child{width:250px}
+.matrix thead th:first-child{width:205px}
 .matrix tbody th{font-weight:600;color:var(--color-ink);font-size:16.5px;padding-left:0}
 .matrix td{line-height:1.3;color:var(--color-ink-soft);background:var(--color-surface);border-top:1px solid var(--color-border);border-bottom:1px solid var(--color-border)}
 .matrix td:first-of-type{border-left:1px solid var(--color-border);border-radius:12px 0 0 12px}
@@ -404,13 +406,15 @@ strong{font-weight:600}
 .gate{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
 .gate .card{position:relative;padding-top:58px}
 .gate .card .chip{position:absolute;top:20px;left:24px}
-.next3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.next3{display:grid;grid-template-columns:repeat(2,1fr);gap:18px 22px}
+.next3 .card{padding:20px 24px}
+.next3 .card dl{display:grid;grid-template-columns:1fr 1fr;gap:0 22px}
 .next3 .card h3{font-size:26px}
 .next3 .card dl{margin-top:14px}
 .next3 .card dt{font:600 13px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--color-gold-ink);margin-top:16px}
 .next3 .card dd{font-size:16.5px;line-height:1.48;color:var(--color-ink-soft);margin-top:6px}
 .decisions{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:16px 30px}
-.decisions li{display:grid;grid-template-columns:40px 1fr;gap:16px;padding:20px 22px;border-radius:var(--radius-card);background:var(--color-surface);box-shadow:var(--shadow-sm),0 0 0 1px var(--color-border)}
+.decisions li{display:grid;grid-template-columns:40px 1fr;gap:16px;padding:16px 22px;border-radius:var(--radius-card);background:var(--color-surface);box-shadow:var(--shadow-sm),0 0 0 1px var(--color-border)}
 .decisions b{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--color-canvas-alt);color:var(--color-gold-ink);font:500 20px/1 var(--serif)}
 .decisions strong{display:block;font-size:19px;color:var(--color-ink)}
 .decisions span{display:block;font-size:16px;line-height:1.45;color:var(--color-ink-soft);margin-top:6px}
@@ -480,7 +484,7 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
     <div class="cover-text">
       <p class="eyebrow light reveal" style="--d:150">Apresentação do sistema</p>
       <h1 class="reveal" style="--d:260">Do pedido no site ao prontuário selado</h1>
-      <p class="cover-sub reveal" style="--d:400">Site, agenda, prontuários, documentos e gestão da Clínica Kavaná, num sistema só.</p>
+      <p class="cover-sub reveal" style="--d:400">Site, agenda, prontuários, documentos, gestão e área do paciente, num sistema só.</p>
       <p class="cover-date reveal" style="--d:540">Outubro de 2026</p>
     </div>
     <div class="cover-art">
@@ -497,7 +501,7 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
     <header class="head">
       <p class="eyebrow reveal">Visão geral</p>
       <h2 class="reveal" style="--d:80">Nesta apresentação</h2>
-      <p class="lead reveal" style="--d:160">Os capítulos seguem o caminho de um atendimento, do site à gestão. Clique em um deles para ir direto.</p>
+      <p class="lead reveal" style="--d:160">Os capítulos seguem o caminho de um atendimento, do site à área do paciente. Clique em um deles para ir direto.</p>
     </header>
     <div class="body"><div class="chapter-cards" data-chapter-cards></div></div>
   </div>
@@ -520,7 +524,7 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
         <article class="pillar reveal" style="--d:420">
           <svg viewBox="0 0 48 48"><rect x="7" y="10" width="34" height="31" rx="5"/><path d="M7 19h34M16 6v8M32 6v8M15 27h6M27 27h6M15 34h6"/></svg>
           <h3>Sistema da clínica</h3>
-          <p>Recepção, profissionais e administração trabalham na mesma agenda, com prontuários, tratamentos, documentos e financeiro.</p>
+          <p>Recepção, profissionais e administração trabalham na mesma agenda, com prontuários, documentos e financeiro. O paciente acompanha o que é dele.</p>
         </article>
         <article class="pillar reveal" style="--d:540">
           <svg viewBox="0 0 48 48"><path d="M24 5l15 6v11c0 10-6 17-15 21-9-4-15-11-15-21V11z"/><path d="M17 24l5 5 9-10"/></svg>
@@ -529,10 +533,10 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
         </article>
       </div>
       <div class="stats">
-        <div class="stat reveal" style="--d:700"><b data-count="3">3</b><span>perfis de acesso: recepção, profissional e administração</span></div>
+        <div class="stat reveal" style="--d:700"><b data-count="4">4</b><span>perfis de acesso: recepção, profissional, administração e paciente</span></div>
         <div class="stat reveal" style="--d:780"><b data-count="5">5</b><span>tipos de documento, numerados e com cópia arquivada</span></div>
-        <div class="stat reveal" style="--d:860"><b data-count="171">171</b><span>testes automáticos na API, rodados a cada etapa</span></div>
-        <div class="stat reveal" style="--d:940"><b data-count="93">93</b><span>verificações feitas nas telas, do site ao painel</span></div>
+        <div class="stat reveal" style="--d:860"><b data-count="185">185</b><span>testes automáticos na API, rodados a cada etapa</span></div>
+        <div class="stat reveal" style="--d:940"><b data-count="101">101</b><span>verificações feitas nas telas, do site à área do paciente</span></div>
       </div>
     </div>
   </div>
@@ -583,6 +587,10 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
         <div class="role reveal" style="--d:560">
           <div><h3>Administração</h3><p>Tudo da recepção, mais painel, usuários, convênios e auditoria. Lê a parte compartilhada dos prontuários, com registro.</p></div>
           <figure class="shot bare" data-shot="nav-admin" data-alt="Menu da administração" style="--d:620"></figure>
+        </div>
+        <div class="role reveal" style="--d:700">
+          <div><h3>Paciente</h3><p>Os próprios atendimentos, documentos e dados, numa área separada, com entrada por CPF.</p></div>
+          <figure class="shot bare" data-shot="nav-paciente" data-alt="Menu da área do paciente" style="--d:760"></figure>
         </div>
       </div>
     </div>
@@ -991,6 +999,7 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
         <div class="item"><figure class="shot phone" data-shot="celular-agenda" data-alt="Agenda do dia no celular"></figure><p class="caption">Agenda do dia</p></div>
         <div class="item"><figure class="shot phone" data-shot="celular-solicitacoes" data-alt="Solicitações do site no celular"></figure><p class="caption">Solicitações do site</p></div>
         <div class="item"><figure class="shot phone" data-shot="celular-prontuario" data-alt="Prontuário finalizado no celular"></figure><p class="caption">Prontuário</p></div>
+        <div class="item"><figure class="shot phone" data-shot="celular-paciente" data-alt="Área do paciente no celular"></figure><p class="caption">Área do paciente</p></div>
       </div>
     </div>
   </div>
@@ -1504,6 +1513,7 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
         <ol class="legend">
           <li data-mark="1"><p><strong>Nenhum conteúdo clínico</strong>: só quem, quando e o quê.</p></li>
           <li data-mark="2"><p><strong>Leituras sensíveis</strong> registradas: ficha do paciente, prontuários, tratamentos e exportações.</p></li>
+          <li data-mark="3"><p><strong>O paciente também aparece</strong>: entradas e documentos abertos na área do paciente, com o nome dele.</p></li>
         </ol>
         <ul class="facts">
           <li>Também ficam registradas as entradas no sistema, as tentativas erradas e as mudanças de cadastro.</li>
@@ -1514,12 +1524,151 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
   </div>
 </section>
 
-<!-- =========================================================== SEGURANÇA -->
-<section class="slide dark divider" id="cap-seguranca" data-chapter="seguranca" data-title="Segurança e LGPD" data-summary="Quem vê o quê, o selo de integridade e a privacidade desde o desenho.">
+<!-- =========================================================== ÁREA DO PACIENTE -->
+<section class="slide dark divider" id="cap-paciente" data-chapter="paciente" data-title="Área do paciente" data-summary="O paciente vê os próprios atendimentos e documentos, com o acesso criado pela recepção.">
   <div class="canvas">
     <span class="div-num reveal">06</span>
     <div class="div-text">
       <p class="eyebrow light reveal" style="--d:120">Capítulo 6</p>
+      <h2 class="reveal" style="--d:220">Área do paciente</h2>
+      <p class="div-lead reveal" style="--d:320">O paciente vê os próprios atendimentos e documentos, com o acesso criado pela recepção.</p>
+    </div>
+    <ol class="div-list" data-chapter-list="paciente"></ol>
+    <img class="div-tree" src="img/brand-tree-mark.webp" alt="" data-overflow-ok>
+  </div>
+</section>
+
+<section class="slide" id="paciente-acesso" data-chapter="paciente" data-title="A recepção cria o acesso">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Área do paciente · Recepção</p>
+      <h2 class="reveal" style="--d:80">A recepção cria o acesso</h2>
+      <p class="lead reveal" style="--d:160">Na ficha do paciente, um clique cria o acesso. Ninguém se cadastra sozinho pelo site.</p>
+    </header>
+    <div class="body split" style="--tw:470px">
+      <div class="side">
+        <ol class="legend sm">
+          <li data-mark="1"><p><strong>Senha provisória</strong> mostrada uma vez, para entregar ao paciente.</p></li>
+          <li data-mark="2"><p><strong>Convite pelo WhatsApp</strong> com o link e a senha, sem o CPF: uma mensagem no número errado não abre nada sozinha.</p></li>
+          <li data-mark="3"><p><strong>Nova senha provisória</strong> quando o paciente esquecer a dele; as sessões abertas terminam.</p></li>
+          <li data-mark="4"><p><strong>Desativar</strong> o acesso a qualquer momento.</p></li>
+        </ol>
+        <p class="note">Por enquanto, só para maiores de idade com CPF no cadastro. O acesso do responsável legal vem numa próxima etapa.</p>
+      </div>
+      <figure class="shot" data-shot="recepcao-acesso-paciente" data-path="kavana · sistema · pacientes" data-alt="Cartão Área do paciente na ficha" style="--fw:640px"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="paciente-entrar" data-chapter="paciente" data-title="Entrar com CPF e senha">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Área do paciente</p>
+      <h2 class="reveal" style="--d:80">Entrar com CPF e senha</h2>
+      <p class="lead reveal" style="--d:160">Uma entrada própria, separada da equipe: outro endereço, outra sessão, outras permissões.</p>
+    </header>
+    <div class="body stack">
+      <div class="duo">
+        <figure class="shot" data-shot="paciente-entrar" data-path="kavana · área do paciente · entrar" data-alt="Entrada da área do paciente"></figure>
+        <figure class="shot" data-shot="paciente-senha" data-path="kavana · área do paciente · senha" data-alt="Escolha da senha no primeiro acesso" style="--d:420"></figure>
+      </div>
+      <ol class="legend cols sm">
+        <li data-shot="paciente-entrar" data-mark="1"><p><strong>CPF</strong> com ou sem pontos, e a senha.</p></li>
+        <li data-shot="paciente-senha" data-mark="1"><p><strong>Senha própria</strong> no primeiro acesso: a provisória não abre mais nada.</p></li>
+        <li data-shot="paciente-entrar" data-mark="2"><p><strong>Sem cadastro aberto</strong>: o acesso vem da recepção.</p></li>
+        <li><p><strong>Mesmas proteções da equipe</strong>: 5 erros em 15 minutos pausam o acesso, e a sessão termina sozinha.</p></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="paciente-inicio" data-chapter="paciente" data-title="O início do paciente">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Área do paciente</p>
+      <h2 class="reveal" style="--d:80">O início do paciente</h2>
+      <p class="lead reveal" style="--d:160">O que importa logo na entrada: o próximo atendimento e os documentos mais recentes.</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ol class="legend">
+          <li data-mark="1"><p><strong>Próximos atendimentos</strong>, com profissional, modalidade e situação.</p></li>
+          <li data-mark="2"><p><strong>Documentos recentes</strong>, prontos para abrir.</p></li>
+          <li data-mark="3"><p><strong>Remarcar ou cancelar</strong> continua com a recepção, pelo WhatsApp.</p></li>
+        </ol>
+      </div>
+      <figure class="shot" data-shot="paciente-inicio" data-path="kavana · área do paciente" data-frame="1280/800" data-alt="Início da área do paciente"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="paciente-atendimentos" data-chapter="paciente" data-title="Atendimentos e pagamentos">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Área do paciente</p>
+      <h2 class="reveal" style="--d:80">Atendimentos e pagamentos</h2>
+      <p class="lead reveal" style="--d:160">Os próximos e os anteriores, com a situação e o pagamento de cada um.</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ol class="legend">
+          <li data-mark="1"><p><strong>Próximos</strong>: confirmado ou agendado.</p></li>
+          <li data-mark="2"><p><strong>Anteriores</strong>: compareceu, faltou ou cancelado, com o valor e se foi pago.</p></li>
+        </ol>
+        <p class="note">Nenhum conteúdo clínico aqui: só data, profissional, modalidade, situação e pagamento.</p>
+      </div>
+      <figure class="shot" data-shot="paciente-atendimentos" data-path="kavana · área do paciente · atendimentos" data-frame="1280/800" data-alt="Atendimentos do paciente"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="paciente-documentos" data-chapter="paciente" data-title="Documentos para imprimir">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Área do paciente</p>
+      <h2 class="reveal" style="--d:80">Documentos para imprimir</h2>
+      <p class="lead reveal" style="--d:160">Declarações, atestados, receitas e relatórios emitidos para o paciente: a mesma cópia arquivada e selada que a clínica guarda.</p>
+    </header>
+    <div class="body stack">
+      <div class="duo">
+        <figure class="shot" data-shot="paciente-documentos" data-path="kavana · área do paciente · documentos" data-frame="1280/760" data-alt="Documentos do paciente"></figure>
+        <figure class="shot" data-shot="paciente-documento" data-path="kavana · área do paciente · documento" data-frame="768/456" data-alt="Declaração aberta pelo paciente" style="--d:420"></figure>
+      </div>
+      <ul class="facts" style="margin-top:0">
+        <li>Imprime ou salva em PDF pelo navegador, com número e selo de integridade.</li>
+        <li>Cada documento aberto entra na <strong>auditoria</strong>, com o nome do paciente.</li>
+        <li>O paciente só alcança os próprios documentos: o de outra pessoa responde como se não existisse.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="paciente-conta" data-chapter="paciente" data-title="Minha conta">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Área do paciente</p>
+      <h2 class="reveal" style="--d:80">Minha conta</h2>
+      <p class="lead reveal" style="--d:160">Os dados do cadastro, os termos assinados e a troca de senha.</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ol class="legend">
+          <li data-mark="1"><p><strong>Dados</strong> só para leitura: correções passam pela recepção.</p></li>
+          <li data-mark="2"><p><strong>Termos assinados</strong>, com a versão e a data (LGPD).</p></li>
+          <li data-mark="3"><p><strong>Trocar senha</strong> encerra as sessões abertas em outros aparelhos.</p></li>
+        </ol>
+      </div>
+      <figure class="shot" data-shot="paciente-conta" data-path="kavana · área do paciente · conta" data-frame="1280/800" data-alt="Minha conta na área do paciente"></figure>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== SEGURANÇA -->
+<section class="slide dark divider" id="cap-seguranca" data-chapter="seguranca" data-title="Segurança e LGPD" data-summary="Quem vê o quê, o selo de integridade e a privacidade desde o desenho.">
+  <div class="canvas">
+    <span class="div-num reveal">07</span>
+    <div class="div-text">
+      <p class="eyebrow light reveal" style="--d:120">Capítulo 7</p>
       <h2 class="reveal" style="--d:220">Segurança e LGPD</h2>
       <p class="div-lead reveal" style="--d:320">Quem vê o quê, o selo de integridade e a privacidade desde o desenho.</p>
     </div>
@@ -1544,18 +1693,19 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
           <button type="button" data-set="p" aria-pressed="false">Psicólogo(a)</button>
           <button type="button" data-set="t" aria-pressed="false">Terapeuta</button>
           <button type="button" data-set="a" aria-pressed="false">Administração</button>
+          <button type="button" data-set="x" aria-pressed="false">Paciente</button>
         </div>
         <table>
-          <thead><tr><th></th><th data-col="r">Recepção</th><th data-col="m">Médico(a)</th><th data-col="p">Psicólogo(a)</th><th data-col="t">Terapeuta</th><th data-col="a">Administração</th></tr></thead>
+          <thead><tr><th></th><th data-col="r">Recepção</th><th data-col="m">Médico(a)</th><th data-col="p">Psicólogo(a)</th><th data-col="t">Terapeuta</th><th data-col="a">Administração</th><th data-col="x">Paciente</th></tr></thead>
           <tbody>
-            <tr><th>Agenda</th><td class="y" data-col="r"><i>✓</i>Todas; marca e altera</td><td class="p" data-col="m">A própria</td><td class="p" data-col="p">A própria</td><td class="p" data-col="t">A própria</td><td class="y" data-col="a"><i>✓</i>Todas; marca e altera</td></tr>
-            <tr><th>Pedidos do site</th><td class="y" data-col="r"><i>✓</i>Responde</td><td class="n" data-col="m">—</td><td class="n" data-col="p">—</td><td class="n" data-col="t">—</td><td class="y" data-col="a"><i>✓</i>Responde</td></tr>
-            <tr><th>Cadastro do paciente</th><td class="y" data-col="r"><i>✓</i>Todos</td><td class="p" data-col="m">Os próprios pacientes</td><td class="p" data-col="p">Os próprios pacientes</td><td class="p" data-col="t">Os próprios pacientes</td><td class="y" data-col="a"><i>✓</i>Todos</td></tr>
-            <tr><th>Prontuário: parte compartilhada</th><td class="n" data-col="r">—</td><td class="p" data-col="m">Dos próprios pacientes</td><td class="p" data-col="p">Dos próprios pacientes</td><td class="p" data-col="t">Dos próprios pacientes</td><td class="p" data-col="a">Lê, com auditoria</td></tr>
-            <tr><th>Anotações restritas</th><td class="n" data-col="r">—</td><td class="p" data-col="m">Só as próprias</td><td class="p" data-col="p">Só as próprias</td><td class="p" data-col="t">Só as próprias</td><td class="n" data-col="a">—</td></tr>
-            <tr><th>Documentos</th><td class="p" data-col="r">Sem conteúdo clínico</td><td class="p" data-col="m">Dos próprios pacientes</td><td class="p" data-col="p">Dos próprios pacientes</td><td class="p" data-col="t">Dos próprios pacientes</td><td class="y" data-col="a"><i>✓</i>Todos</td></tr>
-            <tr><th>Financeiro</th><td class="y" data-col="r"><i>✓</i>Registra pagamentos</td><td class="n" data-col="m">—</td><td class="n" data-col="p">—</td><td class="n" data-col="t">—</td><td class="y" data-col="a"><i>✓</i>Todos</td></tr>
-            <tr><th>Painel, usuários e auditoria</th><td class="n" data-col="r">—</td><td class="n" data-col="m">—</td><td class="n" data-col="p">—</td><td class="n" data-col="t">—</td><td class="y" data-col="a"><i>✓</i>Só a administração</td></tr>
+            <tr><th>Agenda</th><td class="y" data-col="r"><i>✓</i>Todas; marca e altera</td><td class="p" data-col="m">A própria</td><td class="p" data-col="p">A própria</td><td class="p" data-col="t">A própria</td><td class="y" data-col="a"><i>✓</i>Todas; marca e altera</td><td class="p" data-col="x">Os próprios atendimentos</td></tr>
+            <tr><th>Pedidos do site</th><td class="y" data-col="r"><i>✓</i>Responde</td><td class="n" data-col="m">—</td><td class="n" data-col="p">—</td><td class="n" data-col="t">—</td><td class="y" data-col="a"><i>✓</i>Responde</td><td class="n" data-col="x">—</td></tr>
+            <tr><th>Cadastro do paciente</th><td class="y" data-col="r"><i>✓</i>Todos</td><td class="p" data-col="m">Os próprios pacientes</td><td class="p" data-col="p">Os próprios pacientes</td><td class="p" data-col="t">Os próprios pacientes</td><td class="y" data-col="a"><i>✓</i>Todos</td><td class="p" data-col="x">Os próprios dados, só leitura</td></tr>
+            <tr><th>Prontuário: parte compartilhada</th><td class="n" data-col="r">—</td><td class="p" data-col="m">Dos próprios pacientes</td><td class="p" data-col="p">Dos próprios pacientes</td><td class="p" data-col="t">Dos próprios pacientes</td><td class="p" data-col="a">Lê, com auditoria</td><td class="n" data-col="x">—</td></tr>
+            <tr><th>Anotações restritas</th><td class="n" data-col="r">—</td><td class="p" data-col="m">Só as próprias</td><td class="p" data-col="p">Só as próprias</td><td class="p" data-col="t">Só as próprias</td><td class="n" data-col="a">—</td><td class="n" data-col="x">—</td></tr>
+            <tr><th>Documentos</th><td class="p" data-col="r">Sem conteúdo clínico</td><td class="p" data-col="m">Dos próprios pacientes</td><td class="p" data-col="p">Dos próprios pacientes</td><td class="p" data-col="t">Dos próprios pacientes</td><td class="y" data-col="a"><i>✓</i>Todos</td><td class="p" data-col="x">Os emitidos para ele</td></tr>
+            <tr><th>Financeiro</th><td class="y" data-col="r"><i>✓</i>Registra pagamentos</td><td class="n" data-col="m">—</td><td class="n" data-col="p">—</td><td class="n" data-col="t">—</td><td class="y" data-col="a"><i>✓</i>Todos</td><td class="p" data-col="x">Os próprios pagamentos</td></tr>
+            <tr><th>Painel, usuários e auditoria</th><td class="n" data-col="r">—</td><td class="n" data-col="m">—</td><td class="n" data-col="p">—</td><td class="n" data-col="t">—</td><td class="y" data-col="a"><i>✓</i>Só a administração</td><td class="n" data-col="x">—</td></tr>
           </tbody>
         </table>
       </div>
@@ -1647,9 +1797,9 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
     </header>
     <div class="body">
       <div class="stats" style="margin-top:0">
-        <div class="stat reveal" style="--d:260"><b data-count="11">11</b><span>etapas entregues, do diagnóstico ao painel</span></div>
-        <div class="stat reveal" style="--d:340"><b data-count="171">171</b><span>testes automáticos na API, com banco de verdade</span></div>
-        <div class="stat reveal" style="--d:420"><b data-count="93">93</b><span>verificações nas telas, como uma pessoa usaria</span></div>
+        <div class="stat reveal" style="--d:260"><b data-count="12">12</b><span>etapas entregues, do diagnóstico à área do paciente</span></div>
+        <div class="stat reveal" style="--d:340"><b data-count="185">185</b><span>testes automáticos na API, com banco de verdade</span></div>
+        <div class="stat reveal" style="--d:420"><b data-count="101">101</b><span>verificações nas telas, como uma pessoa usaria</span></div>
         <div class="stat reveal" style="--d:500"><b data-count="0">0</b><span>erros no console nas telas verificadas</span></div>
       </div>
       <ul class="facts reveal" style="--d:620;margin-top:28px">
@@ -1665,9 +1815,9 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
 <!-- =========================================================== PRÓXIMOS PASSOS -->
 <section class="slide dark divider" id="cap-proximos" data-chapter="proximos" data-title="Próximos passos" data-summary="O portão para os dados reais, as próximas etapas e o que a clínica decide.">
   <div class="canvas">
-    <span class="div-num reveal">07</span>
+    <span class="div-num reveal">08</span>
     <div class="div-text">
-      <p class="eyebrow light reveal" style="--d:120">Capítulo 7</p>
+      <p class="eyebrow light reveal" style="--d:120">Capítulo 8</p>
       <h2 class="reveal" style="--d:220">Próximos passos</h2>
       <p class="div-lead reveal" style="--d:320">O portão para os dados reais, as próximas etapas e o que a clínica decide.</p>
     </div>
@@ -1688,7 +1838,7 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
         <article class="card reveal" style="--d:260"><span class="chip">a fazer</span><h3>Revisão jurídica</h3><p>Termos de consentimento, política de privacidade, retenção dos dados e contratos com fornecedores.</p></article>
         <article class="card reveal" style="--d:340"><span class="chip">a fazer</span><h3>Backup pago e testado</h3><p>Cópias automáticas do banco, com uma restauração conferida antes de começar.</p></article>
         <article class="card reveal" style="--d:420"><span class="chip">a fazer</span><h3>Verificação em duas etapas</h3><p>Um segundo fator no login de todos os perfis.</p></article>
-        <article class="card reveal" style="--d:500"><span class="chip">a fazer</span><h3>Publicação</h3><p>Site e sistema no ar, com domínio, monitoramento e o agendamento online ligado quando a clínica quiser.</p></article>
+        <article class="card reveal" style="--d:500"><span class="chip">a fazer</span><h3>Publicação</h3><p>Site e sistema no ar, com domínio e monitoramento. O primeiro administrador entra por um script, com a senha digitada só no terminal.</p></article>
       </div>
       <p class="note gold reveal" style="--d:640">Enquanto o portão não abre, a demonstração usa só dados fictícios, como os desta apresentação.</p>
     </div>
@@ -1704,9 +1854,10 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
     </header>
     <div class="body">
       <div class="next3">
-        <article class="card reveal" style="--d:260"><span class="chip">P11</span><h3>Teleatendimento</h3><dl><dt>O que entra</dt><dd>Sala de vídeo por atendimento, link do paciente que expira, consentimento próprio e nada de gravação.</dd><dt>A clínica decide</dt><dd>O fornecedor de vídeo, quais profissões atendem online e a revisão do termo.</dd></dl></article>
-        <article class="card reveal" style="--d:360"><span class="chip">P12</span><h3>Transcrição com apoio de IA</h3><dl><dt>O que entra</dt><dd>Desligada por padrão; o rascunho só entra no prontuário depois de o profissional aprovar, com a marca "apoio de IA".</dd><dt>A clínica decide</dt><dd>Se quer usar, com quais fornecedores e depois da revisão jurídica.</dd></dl></article>
-        <article class="card reveal" style="--d:460"><span class="chip">P13</span><h3>Assinatura digital ICP-Brasil</h3><dl><dt>O que entra</dt><dd>Receita, atestado e documentos assinados digitalmente e verificáveis no ITI.</dd><dt>A clínica decide</dt><dd>O fornecedor do certificado em nuvem, onde guardar os PDFs assinados e o custo.</dd></dl></article>
+        <article class="card reveal" style="--d:260"><span class="chip">P11</span><h3>Teleatendimento</h3><dl><div><dt>O que entra</dt><dd>Sala de vídeo por atendimento, link do paciente que expira, consentimento próprio e nada de gravação.</dd></div><div><dt>A clínica decide</dt><dd>O fornecedor de vídeo, quais profissões atendem online e a revisão do termo.</dd></div></dl></article>
+        <article class="card reveal" style="--d:360"><span class="chip">P12</span><h3>Transcrição com apoio de IA</h3><dl><div><dt>O que entra</dt><dd>Desligada por padrão; o rascunho só entra no prontuário depois de o profissional aprovar, com a marca "apoio de IA".</dd></div><div><dt>A clínica decide</dt><dd>Se quer usar, com quais fornecedores e depois da revisão jurídica.</dd></div></dl></article>
+        <article class="card reveal" style="--d:460"><span class="chip">P13</span><h3>Assinatura digital ICP-Brasil</h3><dl><div><dt>O que entra</dt><dd>Receita, atestado e documentos assinados digitalmente e verificáveis no ITI.</dd></div><div><dt>A clínica decide</dt><dd>O fornecedor do certificado em nuvem, onde guardar os PDFs assinados e o custo.</dd></div></dl></article>
+        <article class="card reveal" style="--d:560"><span class="chip">P14, parte 2</span><h3>Área do paciente: o que falta</h3><dl><div><dt>O que entra</dt><dd>Acesso do responsável legal, pedido de remarcação e de cancelamento pela área e, se a clínica quiser, pagamento online.</dd></div><div><dt>A clínica decide</dt><dd>O que o paciente pode fazer sozinho e, para pagar online, o processador e a política de reembolso.</dd></div></dl></article>
       </div>
     </div>
   </div>
@@ -1727,6 +1878,8 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
         <li class="reveal" style="--d:420"><b>4</b><div><strong>Dados da equipe</strong><span>Registros nos conselhos e quais profissionais aceitam pedidos pelo site.</span></div></li>
         <li class="reveal" style="--d:480"><b>5</b><div><strong>Agendamento online</strong><span>Quando ligar o agendamento pelo site (hoje desligado, com WhatsApp).</span></div></li>
         <li class="reveal" style="--d:540"><b>6</b><div><strong>Fornecedores</strong><span>Vídeo, IA e assinatura digital, para as próximas etapas.</span></div></li>
+        <li class="reveal" style="--d:600"><b>7</b><div><strong>Convite da área do paciente</strong><span>Hoje vai pelo WhatsApp com o link e a senha provisória, sem o CPF. Manter assim?</span></div></li>
+        <li class="reveal" style="--d:660"><b>8</b><div><strong>Pagamento online</strong><span>Se a clínica quiser: o processador, quando cobrar e a política de cancelamento e reembolso.</span></div></li>
       </ol>
     </div>
   </div>
@@ -1785,7 +1938,9 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
   var slides = Array.prototype.slice.call(deck.querySelectorAll(".slide"));
   var total = slides.length;
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var CHAPTERS = { inicio: "Visão geral", site: "Site", recepcao: "Recepção", medica: "Médica", terapias: "Psicologia e terapias", gestao: "Administração", seguranca: "Segurança", proximos: "Próximos passos" };
+  var CHAPTERS = { inicio: "Visão geral", site: "Site", recepcao: "Recepção", medica: "Médica", terapias: "Psicologia e terapias", gestao: "Administração", paciente: "Área do paciente", seguranca: "Segurança", proximos: "Próximos passos" };
+  // Rodapé: nomes curtos, para os nove capítulos caberem numa linha.
+  var SHORT = { terapias: "Terapias", paciente: "Paciente" };
   var current = -1;
   var timers = {};
   var enterHooks = new Map();
@@ -1848,7 +2003,7 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
     var nav = el("nav", "foot-chapters");
     nav.setAttribute("aria-label", "Capítulos");
     chapterOrder.forEach(function (chapter) {
-      nav.append(goButton(chapter === slide.dataset.chapter ? "on" : "", CHAPTERS[chapter], firstOf(chapter)));
+      nav.append(goButton(chapter === slide.dataset.chapter ? "on" : "", SHORT[chapter] || CHAPTERS[chapter], firstOf(chapter)));
     });
     foot.append(brand, nav, el("span", "foot-page", (index + 1) + " / " + total));
     $(".canvas", slide).append(foot);
@@ -1917,8 +2072,10 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
         node.style.height = pct(box[3]);
         // Na borda esquerda da tela, o número vai para o canto direito (ou para a borda de cima,
         // se a caixa ocupa a largura toda); colado no topo, desce para dentro da moldura.
-        if (box[0] * meta.w < 20) node.classList.add(box[0] + box[2] < 0.9 ? "badge-right" : "badge-top");
-        if (box[1] * meta.h < 18) node.classList.add("badge-low");
+        // O build pode escolher o canto (box[4]) quando o número cobriria o texto.
+        if (box[4]) node.classList.add("badge-" + box[4]);
+        else if (box[0] * meta.w < 20) node.classList.add(box[0] + box[2] < 0.9 ? "badge-right" : "badge-top");
+        if (!box[4] && box[1] * meta.h < 18) node.classList.add("badge-low");
         node.append(el("b"));
         stage.append(node);
       });
@@ -2131,7 +2288,7 @@ body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
       $$("[data-col]", widget).forEach(function (cell) { cell.classList.toggle("sel", cell.dataset.col === role); });
       buttons.forEach(function (button) { button.setAttribute("aria-pressed", button.dataset.set === role ? "true" : "false"); });
     }
-    var control = autoSwitch(slide, widget, ["all", "r", "m", "p", "t", "a", "all"], apply, 2600);
+    var control = autoSwitch(slide, widget, ["all", "r", "m", "p", "t", "a", "x", "all"], apply, 2600);
     buttons.forEach(function (button) {
       button.addEventListener("click", function (event) { event.stopPropagation(); control.stop(); apply(button.dataset.set); });
     });
