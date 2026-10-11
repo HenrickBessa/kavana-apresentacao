@@ -1,0 +1,2446 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kavaná · Apresentação do sistema</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Apresentação interativa do sistema da Clínica Kavaná: site, agenda, prontuários, documentos, gestão e segurança. Telas reais com dados fictícios.">
+<!--
+  Apresentação do sistema da Clínica Kavaná (PF). Abra este arquivo no navegador: setas, espaço ou clique
+  avançam; I abre o índice; F, tela cheia; ? mostra os atalhos.
+  Telas reais do sistema com dados fictícios do ambiente de demonstração. As capturas (img/), a posição dos
+  destaques (shots.js), as fontes (fonts/) e o bloco de tokens abaixo vêm de build.mjs; o resto é escrito aqui.
+  Cores só pelos tokens do design system (src/app/globals.css).
+-->
+<style>
+@font-face{font-family:"Fraunces";src:url("fonts/fraunces-latin.woff2") format("woff2");font-weight:100 900;font-display:swap}
+@font-face{font-family:"Inter";src:url("fonts/inter-latin.woff2") format("woff2");font-weight:100 900;font-display:swap}
+/* tokens:start (gerado por build.mjs a partir de src/app/globals.css: não edite à mão) */
+:root {
+  --color-transparent: transparent;
+  --color-current: currentColor;
+  --color-canvas: #faf7f0;
+  --color-canvas-alt: #f3ebdd;
+  --color-surface: #fffcf7;
+  --color-gold: #c79a4a;
+  --color-gold-dark: #96703a;
+  --color-gold-light: #ddbd7a;
+  --color-gold-ink: #7a5a2e;
+  --color-sage: #a8b5a0;
+  --color-sage-dark: #687a63;
+  --color-sage-light: #eef1eb;
+  --color-ink: #3b3025;
+  --color-ink-soft: #756a5d;
+  --color-border: #e8dfd1;
+  --color-success: #6f8b6a;
+  --color-success-ink: #5e7a59;
+  --color-warning: #c49a58;
+  --color-error: #b5675f;
+  --color-error-ink: #9a5249;
+  --color-footer-bg: #30271f;
+  --color-footer-title: #f3ebdd;
+  --color-footer-text: #c9bfb2;
+  --color-footer-link: #ddbd7a;
+  --radius-sm: 0.5rem;
+  --radius-control: 0.875rem;
+  --radius-card: 1.25rem;
+  --radius-modal: 1.5rem;
+  --radius-full: 9999px;
+  --shadow-xs: 0 1px 2px rgb(85 67 43 / 0.06);
+  --shadow-sm: 0 2px 8px rgb(85 67 43 / 0.06), 0 1px 2px rgb(85 67 43 / 0.04);
+  --shadow-md: 0 10px 30px rgb(85 67 43 / 0.08), 0 2px 6px rgb(85 67 43 / 0.04);
+  --shadow-lg: 0 20px 50px rgb(85 67 43 / 0.12), 0 4px 12px rgb(85 67 43 / 0.05);
+  --shadow-focus: 0 0 0 3px rgb(199 154 74 / 0.14);
+  --shadow-focus-error: 0 0 0 3px rgb(181 103 95 / 0.14);
+  --ease-organic: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-gentle: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 200ms;
+  --duration-base: 350ms;
+  --duration-slow: 500ms;
+  --duration-reveal: 900ms;
+}
+/* tokens:end */
+:root{
+  --serif:"Fraunces",ui-serif,Georgia,"Times New Roman",serif;
+  --sans:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --s:1;--dir:1;
+  --dim:color-mix(in srgb,var(--color-ink) 50%,transparent);
+  --glass:color-mix(in srgb,var(--color-footer-bg) 92%,transparent);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--color-footer-bg);color:var(--color-ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow:hidden}
+img{display:block;max-width:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible,[tabindex]:focus-visible,a:focus-visible{outline:2px solid var(--color-gold);outline-offset:3px}
+kbd{display:inline-block;font:600 .82em/1 var(--sans);padding:.28em .5em;border-radius:6px;border:1px solid currentColor;margin:0 .1em}
+strong{font-weight:600}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- Palco e transições ---------- */
+#deck{position:fixed;inset:0}
+.slide{position:absolute;inset:0;visibility:hidden;opacity:0;transition:opacity .55s var(--ease-gentle),visibility 0s linear .55s}
+.slide.active{visibility:visible;opacity:1;transition:opacity .55s var(--ease-gentle),visibility 0s}
+.slide.leaving{visibility:visible}
+.canvas{position:absolute;left:50%;top:50%;width:1485px;height:1050px;margin:-525px 0 0 -742.5px;transform:scale(var(--s));transform-origin:center;overflow:hidden;display:flex;flex-direction:column;padding:58px 80px 0;
+  background:radial-gradient(52% 42% at 94% 0%,color-mix(in srgb,var(--color-gold-light) 18%,transparent),transparent 72%),radial-gradient(40% 40% at 0% 100%,color-mix(in srgb,var(--color-sage-light) 70%,transparent),transparent 70%),var(--color-canvas)}
+.slide.active .canvas{animation:canvas-in .8s var(--ease-organic) both}
+.slide.leaving .canvas{animation:canvas-out .55s var(--ease-gentle) both}
+@keyframes canvas-in{from{translate:calc(var(--dir) * 64px) 0}to{translate:0 0}}
+@keyframes canvas-out{to{translate:calc(var(--dir) * -64px) 0}}
+.reveal{opacity:0}
+.slide.active .reveal{animation:rise .8s var(--ease-organic) both;animation-delay:calc(var(--d,0) * 1ms + 120ms)}
+.slide.leaving .reveal{opacity:1}
+@keyframes rise{from{opacity:0;translate:0 24px}to{opacity:1;translate:0 0}}
+
+/* ---------- Cabeçalho, corpo e rodapé ---------- */
+.head{flex:none;max-width:1200px}
+.eyebrow{display:flex;align-items:center;gap:14px;font:600 15px/1 var(--sans);letter-spacing:var(--tracking-eyebrow,.16em);text-transform:uppercase;color:var(--color-gold-ink)}
+.eyebrow::before{content:"";width:44px;height:1px;background:var(--color-gold)}
+.eyebrow.light{color:var(--color-footer-link)}
+.head h2{font:500 54px/1.06 var(--serif);letter-spacing:-.012em;color:var(--color-ink);margin-top:16px;text-wrap:balance}
+.lead{font-size:22px;line-height:1.45;color:var(--color-ink-soft);margin-top:12px;max-width:1100px;text-wrap:pretty}
+.lead strong{color:var(--color-ink)}
+.body{flex:1;min-height:0;margin:30px 0 100px;position:relative;display:flex;flex-direction:column;justify-content:center}
+.foot{position:absolute;left:80px;right:80px;bottom:24px;height:46px;display:grid;grid-template-columns:230px 1fr 110px;align-items:center;gap:16px;border-top:1px solid var(--color-border);font-size:14px;color:var(--color-ink-soft)}
+.foot-brand{display:flex;align-items:center;gap:10px;font-weight:500;color:var(--color-ink)}
+.foot-brand img{height:26px;width:auto}
+.foot-chapters{display:flex;justify-content:center;gap:2px}
+.foot-chapters button{padding:6px 10px;border-radius:999px;color:var(--color-ink-soft);font-size:13.5px;white-space:nowrap;transition:background .25s,color .25s}
+.foot-chapters button:hover{background:var(--color-canvas-alt);color:var(--color-ink)}
+.foot-chapters button.on{color:var(--color-gold-ink);font-weight:600;background:var(--color-canvas-alt)}
+.foot-page{text-align:right;font-variant-numeric:tabular-nums}
+.dark .foot{border-color:color-mix(in srgb,var(--color-footer-text) 22%,transparent);color:var(--color-footer-text)}
+.dark .foot-brand{color:var(--color-footer-title)}
+.dark .foot-chapters button{color:var(--color-footer-text)}
+.dark .foot-chapters button:hover,.dark .foot-chapters button.on{background:color-mix(in srgb,var(--color-footer-title) 10%,transparent);color:var(--color-footer-link)}
+
+/* ---------- Telas (moldura de navegador, celular, destaques) ---------- */
+.shot{position:relative;margin:0;width:100%;max-width:var(--fw,none);border-radius:var(--radius-card);background:var(--color-surface);box-shadow:var(--shadow-lg),0 0 0 1px var(--color-border);overflow:hidden;opacity:0}
+.slide.active .shot{animation:shot-in .95s var(--ease-organic) both;animation-delay:calc(var(--d,240) * 1ms)}
+.slide.leaving .shot{opacity:1}
+@keyframes shot-in{from{opacity:0;translate:44px 16px;scale:.975}to{opacity:1;translate:0 0;scale:1}}
+.shot-bar{height:36px;display:flex;align-items:center;gap:8px;padding:0 14px;background:var(--color-canvas-alt);border-bottom:1px solid var(--color-border)}
+.shot-bar i{width:11px;height:11px;border-radius:50%;background:var(--color-border)}
+.shot-bar i:nth-child(2){background:var(--color-gold-light)}
+.shot-bar i:nth-child(3){background:var(--color-sage)}
+.shot-bar span{margin-left:12px;flex:0 1 440px;height:22px;border-radius:999px;background:var(--color-surface);display:flex;align-items:center;gap:6px;padding:0 12px;font-size:12.5px;color:var(--color-ink-soft);white-space:nowrap;overflow:hidden}
+.shot-bar svg{width:11px;height:11px;flex:none;fill:none;stroke:var(--color-sage-dark);stroke-width:2.4}
+.shot-view{position:relative;overflow:hidden;background:var(--color-canvas);cursor:zoom-in}
+.shot-stage{position:absolute;left:0;top:0;width:100%;transition:transform 1.1s var(--ease-organic)}
+.shot-stage>img{width:100%;height:100%;user-select:none}
+.shot.tall .shot-view::after{content:"";position:absolute;left:0;right:0;bottom:0;height:42px;background:linear-gradient(to top,color-mix(in srgb,var(--color-ink) 9%,transparent),transparent);pointer-events:none}
+.shot.drift .shot-stage{animation:drift var(--drift-time,12s) var(--ease-gentle) 1.4s infinite}
+.shot.drift:hover .shot-stage{animation-play-state:paused}
+@keyframes drift{0%,10%{transform:translateY(0)}48%,60%{transform:translateY(var(--drift))}100%{transform:translateY(0)}}
+.shot.phone{width:var(--pw,250px);max-width:none;padding:10px;border-radius:46px;background:var(--color-footer-bg);box-shadow:var(--shadow-lg),0 0 0 1px color-mix(in srgb,var(--color-footer-title) 12%,transparent)}
+.shot.phone .shot-view{border-radius:36px}
+.shot.bare{border-radius:14px}
+.mark{position:absolute;border:2.5px solid var(--color-gold);border-radius:12px;background:color-mix(in srgb,var(--color-gold-light) 10%,transparent);opacity:0;transition:opacity .45s var(--ease-gentle),box-shadow .55s var(--ease-gentle),scale .55s var(--ease-organic);cursor:pointer;z-index:2}
+.mark.shown{opacity:1}
+.mark b{position:absolute;left:-15px;top:-15px;width:30px;height:30px;border-radius:50%;background:var(--color-gold-dark);color:var(--color-surface);font:700 14px/30px var(--sans);text-align:center;box-shadow:0 0 0 3px var(--color-surface)}
+.mark.badge-right b{left:auto;right:-15px}
+.mark.badge-top b{left:22px}
+.mark.badge-low b{top:4px}
+.mark.on{box-shadow:0 0 0 9999px var(--dim);z-index:3;scale:1.012}
+.mark.on b{background:var(--color-gold);color:var(--color-ink);animation:pulse 1.4s var(--ease-gentle) infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 3px var(--color-surface),0 0 0 3px color-mix(in srgb,var(--color-gold) 70%,transparent)}50%{box-shadow:0 0 0 3px var(--color-surface),0 0 0 14px color-mix(in srgb,var(--color-gold) 0%,transparent)}}
+.missing-text{padding:40px;font-size:18px;color:var(--color-error-ink)}
+
+/* ---------- Legendas, fatos e notas ---------- */
+.side{display:flex;flex-direction:column;justify-content:center;min-height:0}
+.legend{list-style:none;display:flex;flex-direction:column;gap:6px}
+.legend li{display:grid;grid-template-columns:32px 1fr;gap:14px;align-items:start;padding:10px 12px;border-radius:14px;transition:background .3s,box-shadow .3s}
+.legend li[data-placed]{cursor:pointer}
+.legend li>b{width:32px;height:32px;border-radius:50%;background:var(--color-gold-dark);color:var(--color-surface);display:grid;place-items:center;font:700 14px/1 var(--sans);transition:background .3s,color .3s,scale .3s}
+.legend li:not([data-mark])>b{background:var(--color-sage-light);color:var(--color-sage-dark)}
+.legend p{font-size:19px;line-height:1.42;color:var(--color-ink-soft)}
+.legend strong{color:var(--color-ink)}
+.legend li.on{background:var(--color-surface);box-shadow:var(--shadow-sm),0 0 0 1px var(--color-border)}
+.legend li.on>b{background:var(--color-gold);color:var(--color-ink);scale:1.08}
+.legend.cols{display:grid;grid-template-columns:1fr 1fr;gap:4px 28px}
+.legend.sm p{font-size:17.5px}
+.facts{list-style:none;display:flex;flex-direction:column;gap:9px;margin-top:20px;padding-top:18px;border-top:1px solid var(--color-border)}
+.facts li{position:relative;padding-left:22px;font-size:17px;line-height:1.45;color:var(--color-ink-soft)}
+.facts li::before{content:"";position:absolute;left:3px;top:.6em;width:8px;height:8px;border-radius:50%;background:var(--color-sage)}
+.facts strong{color:var(--color-ink)}
+.note{display:flex;gap:14px;align-items:flex-start;padding:14px 18px;border-radius:14px;background:var(--color-sage-light);color:var(--color-ink);font-size:17px;line-height:1.45;margin-top:18px}
+.note::before{content:"";flex:none;width:5px;align-self:stretch;border-radius:3px;background:var(--color-sage-dark)}
+.note.gold{background:color-mix(in srgb,var(--color-gold-light) 22%,var(--color-surface))}
+.note.gold::before{background:var(--color-gold)}
+.prose{font-size:20px;line-height:1.5;color:var(--color-ink-soft)}
+.prose strong{color:var(--color-ink)}
+
+/* ---------- Layouts ---------- */
+.split{display:grid;grid-template-columns:var(--tw,430px) minmax(0,1fr);gap:56px;align-items:center;height:100%}
+.split.rev{grid-template-columns:minmax(0,1fr) var(--tw,430px)}
+.split>.shot{justify-self:center}
+.split>.figs{justify-self:stretch}
+.figs>.shot:not(.phone){flex:1 1 auto}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:start}
+.stack{display:flex;flex-direction:column;gap:24px}
+.figs{display:flex;gap:28px;align-items:flex-end;justify-content:center}
+.caption{margin-top:12px;font-size:15px;color:var(--color-ink-soft);text-align:center}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font:600 13px/1.2 var(--sans);letter-spacing:.04em;background:var(--color-canvas-alt);color:var(--color-gold-ink)}
+.chip.sage{background:var(--color-sage-light);color:var(--color-sage-dark)}
+
+/* ---------- Capa e encerramento ---------- */
+.dark .canvas{color:var(--color-footer-title);background:radial-gradient(58% 66% at 80% 38%,color-mix(in srgb,var(--color-gold) 24%,transparent),transparent 72%),radial-gradient(40% 50% at 6% 100%,color-mix(in srgb,var(--color-sage-dark) 32%,transparent),transparent 70%),var(--color-footer-bg)}
+.cover .canvas{padding:0}
+.cover-logo{position:absolute;left:80px;top:64px;height:150px;width:auto}
+.cover-text{position:absolute;left:80px;top:300px;width:640px}
+.cover h1{font:500 76px/1.03 var(--serif);letter-spacing:-.016em;color:var(--color-footer-title);margin-top:22px;text-wrap:balance}
+.cover-sub{font-size:24px;line-height:1.45;color:var(--color-footer-text);margin-top:26px;max-width:600px}
+.cover-date{margin-top:30px;font:600 16px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--color-footer-link)}
+.cover-art{position:absolute;left:770px;top:170px;width:650px;height:640px}
+.cover-desktop{position:absolute;left:0;top:60px;--fw:620px;rotate:-2.5deg}
+.cover-phone{position:absolute;left:470px;top:250px;--pw:200px;rotate:4deg}
+.slide.active .cover-desktop{animation:shot-in 1s var(--ease-organic) .5s both,float 8s ease-in-out 1.8s infinite}
+.slide.active .cover-phone{animation:shot-in 1s var(--ease-organic) .85s both,float 7s ease-in-out 2.2s infinite reverse}
+@keyframes float{0%,100%{translate:0 0}50%{translate:0 -12px}}
+.cover-note{position:absolute;left:80px;bottom:100px;font-size:17px;color:var(--color-footer-text)}
+.cover-hint{position:absolute;left:80px;bottom:58px;font-size:15px;color:var(--color-footer-text);opacity:.8}
+.end .canvas{padding:0;align-items:center;justify-content:center;text-align:center}
+.end-logo{height:220px;width:auto}
+.end h2{font:500 96px/1 var(--serif);margin-top:40px;color:var(--color-footer-title)}
+.end p{font-size:24px;color:var(--color-footer-text);margin-top:22px}
+.end .chip{margin-top:30px;background:color-mix(in srgb,var(--color-footer-title) 10%,transparent);color:var(--color-footer-link)}
+
+/* ---------- Abertura de capítulo ---------- */
+.divider .canvas{padding:0}
+.div-num{position:absolute;left:62px;top:36px;font:300 300px/1 var(--serif);letter-spacing:-.05em;background:linear-gradient(170deg,var(--color-gold-light),color-mix(in srgb,var(--color-gold-dark) 55%,transparent));-webkit-background-clip:text;background-clip:text;color:transparent}
+.div-text{position:absolute;left:80px;top:380px;width:640px}
+.div-text h2{font:500 78px/1.03 var(--serif);margin-top:20px;color:var(--color-footer-title);letter-spacing:-.015em}
+.div-lead{font-size:24px;line-height:1.45;color:var(--color-footer-text);margin-top:22px}
+.div-list{position:absolute;right:80px;top:120px;width:540px;list-style:none;display:flex;flex-direction:column;gap:4px}
+.div-list button{width:100%;display:grid;grid-template-columns:44px 1fr 20px;gap:12px;align-items:center;padding:11px 14px;border-radius:12px;text-align:left;font-size:19px;color:var(--color-footer-title);transition:background .25s,translate .25s}
+.div-list button:hover{background:color-mix(in srgb,var(--color-footer-title) 8%,transparent);translate:6px 0}
+.div-list span{font:500 15px/1 var(--sans);color:var(--color-footer-link);font-variant-numeric:tabular-nums}
+.div-list svg{width:16px;height:16px;fill:none;stroke:var(--color-footer-link);stroke-width:2}
+.div-tree{position:absolute;right:-150px;bottom:-210px;width:620px;opacity:.06;pointer-events:none}
+
+/* ---------- Índice (slide 2) ---------- */
+.chapter-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;height:100%}
+.chapter-card{position:relative;display:flex;flex-direction:column;padding:26px 24px;border-radius:var(--radius-card);background:var(--color-surface);box-shadow:var(--shadow-sm),0 0 0 1px var(--color-border);text-align:left;transition:translate .3s var(--ease-organic),box-shadow .3s}
+.chapter-card:hover{translate:0 -6px;box-shadow:var(--shadow-md),0 0 0 1px var(--color-gold-light)}
+.chapter-card .num{font:400 52px/1 var(--serif);color:var(--color-gold)}
+.chapter-card h3{font:500 26px/1.15 var(--serif);margin-top:14px;color:var(--color-ink)}
+.chapter-card p{font-size:16px;line-height:1.45;color:var(--color-ink-soft);margin-top:10px;flex:1}
+.chapter-card small{margin-top:16px;font:600 13px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--color-gold-ink)}
+.chapter-card.intro{background:var(--color-footer-bg);box-shadow:none}
+.chapter-card.intro h3{color:var(--color-footer-title)}
+.chapter-card.intro p{color:var(--color-footer-text)}
+.chapter-card.intro .num{color:var(--color-footer-link)}
+
+/* ---------- Visão geral ---------- */
+.pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.pillar{padding:30px 30px 28px;border-radius:var(--radius-card);background:var(--color-surface);box-shadow:var(--shadow-sm),0 0 0 1px var(--color-border)}
+.pillar svg{width:44px;height:44px;fill:none;stroke:var(--color-gold-dark);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.pillar h3{font:500 28px/1.15 var(--serif);margin-top:18px}
+.pillar p{font-size:18px;line-height:1.5;color:var(--color-ink-soft);margin-top:10px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:30px}
+.stat{padding:22px 26px;border-radius:var(--radius-card);border:1px solid var(--color-border)}
+.stat b{display:block;font:500 58px/1 var(--serif);color:var(--color-gold-dark);font-variant-numeric:tabular-nums}
+.stat span{display:block;margin-top:10px;font-size:16px;line-height:1.4;color:var(--color-ink-soft)}
+
+/* ---------- Fluxo em uma imagem ---------- */
+.flow{position:relative;display:flex;flex-direction:column;gap:34px}
+.flow-track{position:absolute;left:70px;right:70px;top:22px;height:3px;border-radius:2px;background:var(--color-border);overflow:hidden}
+.flow-track i{position:absolute;inset:0;background:linear-gradient(90deg,var(--color-gold-light),var(--color-gold));transform-origin:left;scale:0 1}
+.slide.active .flow-track i{animation:grow 2.4s var(--ease-organic) .4s both}
+@keyframes grow{to{scale:1 1}}
+.flow-runner{position:absolute;top:16px;left:70px;width:15px;height:15px;border-radius:50%;background:var(--color-gold);box-shadow:0 0 0 5px color-mix(in srgb,var(--color-gold) 25%,transparent);opacity:0}
+.slide.active .flow-runner{animation:run 5.5s var(--ease-gentle) 2.9s infinite}
+@keyframes run{0%{left:70px;opacity:0}8%{opacity:1}92%{opacity:1}100%{left:calc(100% - 85px);opacity:0}}
+.flow-steps{list-style:none;display:grid;grid-template-columns:repeat(6,1fr);gap:20px;position:relative}
+.flow-steps li{display:flex;flex-direction:column;cursor:pointer;border-radius:16px;padding:0 4px 8px;transition:translate .3s var(--ease-organic)}
+.flow-steps li:hover{translate:0 -6px}
+.flow-dot{align-self:center;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--color-footer-bg);color:var(--color-footer-link);font:500 21px/1 var(--serif);box-shadow:0 0 0 6px var(--color-canvas);scale:0}
+.slide.active .flow-dot{animation:pop .6s var(--ease-organic) both;animation-delay:calc(var(--i) * 380ms + 500ms)}
+@keyframes pop{from{scale:0}70%{scale:1.12}to{scale:1}}
+.flow-steps .thumb{margin-top:22px;aspect-ratio:4/3.6;border-radius:14px;overflow:hidden;background:var(--color-surface);box-shadow:var(--shadow-md),0 0 0 1px var(--color-border);opacity:0}
+.slide.active .flow-steps .thumb{animation:rise .8s var(--ease-organic) both;animation-delay:calc(var(--i) * 380ms + 650ms)}
+.flow-steps .thumb img{width:100%;height:100%;object-fit:cover;object-position:top left}
+.flow-steps h3{font:500 24px/1.15 var(--serif);margin-top:16px}
+.flow-steps .who{align-self:flex-start;margin-top:8px}
+.flow-steps p{font-size:16px;line-height:1.45;color:var(--color-ink-soft);margin-top:8px}
+.flow-steps h3,.flow-steps .who,.flow-steps p{opacity:0}
+.slide.active .flow-steps h3,.slide.active .flow-steps .who,.slide.active .flow-steps p{animation:rise .7s var(--ease-organic) both;animation-delay:calc(var(--i) * 380ms + 780ms)}
+.flow-rule{padding:20px 28px;border-radius:16px;background:var(--color-footer-bg);color:var(--color-footer-title);font-size:20px;line-height:1.45}
+.flow-rule strong{color:var(--color-footer-link)}
+
+/* ---------- Perfis ---------- */
+.roles{display:flex;flex-direction:column;gap:30px}
+.role{display:grid;grid-template-columns:290px 1fr;gap:34px;align-items:center}
+.role h3{font:500 28px/1.15 var(--serif)}
+.role p{font-size:17px;line-height:1.45;color:var(--color-ink-soft);margin-top:8px}
+.role .shot{border-radius:14px}
+
+/* ---------- Agendamento em etapas ---------- */
+.stepper{display:grid;grid-template-columns:400px minmax(0,1fr);gap:52px;align-items:center;height:100%}
+.stepper-tabs{list-style:none;display:flex;flex-direction:column;gap:6px}
+.stepper-tabs button{position:relative;width:100%;display:grid;grid-template-columns:34px 1fr;gap:14px;align-items:start;padding:12px 14px;border-radius:14px;text-align:left;overflow:hidden;transition:background .3s,box-shadow .3s}
+.stepper-tabs button b{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--color-canvas-alt);color:var(--color-gold-ink);font:700 15px/1 var(--sans);transition:background .3s,color .3s}
+.stepper-tabs strong{display:block;font-size:19px;color:var(--color-ink);margin-top:5px}
+.stepper-tabs span{display:block;font-size:16px;line-height:1.42;color:var(--color-ink-soft);max-height:0;opacity:0;transition:max-height .5s var(--ease-gentle),opacity .4s,margin .4s}
+.stepper-tabs button.on{background:var(--color-surface);box-shadow:var(--shadow-sm),0 0 0 1px var(--color-border)}
+.stepper-tabs button.on b{background:var(--color-gold);color:var(--color-ink)}
+.stepper-tabs button.on span{max-height:90px;opacity:1;margin-top:6px}
+.stepper.auto .stepper-tabs button.on::after{content:"";position:absolute;left:0;bottom:0;height:3px;width:100%;background:var(--color-gold);transform-origin:left;animation:progress var(--step-time,2.8s) linear both}
+@keyframes progress{from{scale:0 1}to{scale:1 1}}
+.swap{display:grid;justify-items:center}
+.swap>*{grid-area:1/1}
+.swap>.shot{animation:none!important;opacity:0;translate:18px 0;transition:opacity .55s var(--ease-gentle),translate .7s var(--ease-organic)}
+.swap>.shot.current{opacity:1;translate:0 0}
+.slide:not(.active) .swap>.shot{transition:none}
+.slide.leaving .swap>.shot:not(.current){opacity:0}
+
+/* ---------- Interruptor e "ver como" ---------- */
+.switch{display:inline-flex;align-items:center;gap:16px;padding:10px 20px 10px 10px;border-radius:999px;background:var(--color-surface);box-shadow:var(--shadow-sm),0 0 0 1px var(--color-border);font-size:19px}
+.switch .track{position:relative;width:64px;height:36px;border-radius:999px;background:var(--color-border);transition:background .35s}
+.switch .knob{position:absolute;top:4px;left:4px;width:28px;height:28px;border-radius:50%;background:var(--color-surface);box-shadow:var(--shadow-sm);transition:translate .45s var(--ease-organic)}
+.switch[aria-checked="true"] .track{background:var(--color-sage-dark)}
+.switch[aria-checked="true"] .knob{translate:28px 0}
+.state-text{display:none;font-size:20px;line-height:1.5;color:var(--color-ink-soft);margin-top:22px}
+.state-text strong{color:var(--color-ink)}
+[data-state="on"] .state-text[data-for="on"],[data-state="off"] .state-text[data-for="off"],[data-state="author"] .state-text[data-for="author"],[data-state="admin"] .state-text[data-for="admin"]{display:block;animation:rise .5s var(--ease-organic) both}
+.seg{display:inline-flex;padding:5px;border-radius:999px;background:var(--color-canvas-alt);gap:4px}
+.seg button{padding:10px 20px;border-radius:999px;font-size:17px;color:var(--color-ink-soft);transition:background .3s,color .3s,box-shadow .3s}
+.seg button[aria-pressed="true"]{background:var(--color-surface);color:var(--color-ink);font-weight:600;box-shadow:var(--shadow-sm)}
+
+/* ---------- Mensagens de WhatsApp ---------- */
+.chats{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+.chat{border-radius:26px;overflow:hidden;background:var(--color-surface);box-shadow:var(--shadow-lg),0 0 0 1px var(--color-border)}
+.chat-head{display:flex;align-items:center;gap:14px;padding:16px 20px;background:var(--color-footer-bg);color:var(--color-footer-title)}
+.chat-head img{width:40px;height:40px;border-radius:50%;background:var(--color-canvas);padding:5px;object-fit:contain}
+.chat-head strong{display:block;font-size:17px}
+.chat-head small{display:block;font-size:13px;color:var(--color-footer-text);margin-top:2px}
+.chat-body{min-height:230px;padding:28px 24px;background:radial-gradient(circle at 20% 10%,color-mix(in srgb,var(--color-sage-light) 80%,transparent),transparent 60%),var(--color-canvas-alt);display:flex;flex-direction:column;gap:12px}
+.chat-tag{align-self:center;font-size:13px;padding:5px 12px;border-radius:999px;background:var(--color-surface);color:var(--color-ink-soft)}
+.bubble{align-self:flex-end;max-width:88%;padding:14px 18px 26px;border-radius:18px 18px 4px 18px;background:var(--color-sage-light);box-shadow:var(--shadow-xs);font-size:18px;line-height:1.45;position:relative;min-height:56px}
+.bubble::after{content:"enviar pelo WhatsApp da clínica";position:absolute;right:14px;bottom:6px;font-size:11.5px;color:var(--color-sage-dark)}
+.typing::after{content:"";display:inline-block;width:2px;height:1.1em;margin-left:2px;vertical-align:-.2em;background:var(--color-ink);animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* ---------- Celular ---------- */
+.phones{display:flex;justify-content:center;gap:44px;align-items:flex-start}
+.phones figure{--pw:236px}
+.phones .item{display:flex;flex-direction:column;align-items:center}
+.phones .item:nth-child(even){margin-top:34px}
+.slide.active .phones .item:nth-child(1) .shot{animation:shot-in .95s var(--ease-organic) .25s both,float 7s ease-in-out 1.5s infinite}
+.slide.active .phones .item:nth-child(2) .shot{animation:shot-in .95s var(--ease-organic) .4s both,float 8s ease-in-out 1.8s infinite reverse}
+.slide.active .phones .item:nth-child(3) .shot{animation:shot-in .95s var(--ease-organic) .55s both,float 7.5s ease-in-out 2.1s infinite}
+.slide.active .phones .item:nth-child(4) .shot{animation:shot-in .95s var(--ease-organic) .7s both,float 8.5s ease-in-out 2.4s infinite reverse}
+
+/* ---------- Quem vê o quê ---------- */
+.matrix{display:flex;flex-direction:column;gap:18px}
+.matrix table{width:100%;border-collapse:separate;border-spacing:0 6px;table-layout:fixed;font-size:16px}
+.matrix th,.matrix td{padding:11px 12px;text-align:left;vertical-align:middle;transition:opacity .4s,background .4s}
+.matrix thead th{font:600 15px/1.2 var(--sans);color:var(--color-gold-ink);letter-spacing:.02em}
+.matrix thead th:first-child{width:250px}
+.matrix tbody th{font-weight:600;color:var(--color-ink);font-size:16.5px;padding-left:0}
+.matrix td{line-height:1.3;color:var(--color-ink-soft);background:var(--color-surface);border-top:1px solid var(--color-border);border-bottom:1px solid var(--color-border)}
+.matrix td:first-of-type{border-left:1px solid var(--color-border);border-radius:12px 0 0 12px}
+.matrix td:last-child{border-right:1px solid var(--color-border);border-radius:0 12px 12px 0}
+.matrix td.y{color:var(--color-success-ink);font-weight:600}
+.matrix td.n{color:color-mix(in srgb,var(--color-ink-soft) 60%,transparent)}
+.matrix td.p{color:var(--color-gold-ink);font-weight:500}
+.matrix td i{font-style:normal;margin-right:6px}
+.matrix:not([data-role="all"]) [data-col]:not(.sel){opacity:.22}
+.matrix:not([data-role="all"]) td.sel{background:color-mix(in srgb,var(--color-gold-light) 22%,var(--color-surface));animation:cell .5s var(--ease-organic) both}
+@keyframes cell{from{scale:.94}to{scale:1}}
+
+/* ---------- Selo de integridade ---------- */
+.seal{display:grid;grid-template-columns:1fr 520px;gap:40px;align-items:start}
+.seal-record{padding:28px 30px;border-radius:var(--radius-card);background:var(--color-surface);box-shadow:var(--shadow-md),0 0 0 1px var(--color-border)}
+.seal-record header{display:flex;justify-content:space-between;align-items:center;font-size:15px;color:var(--color-ink-soft)}
+.seal-record label{display:block;margin-top:18px;font-size:14px;font-weight:600;color:var(--color-ink-soft)}
+.seal-record textarea,.seal-record input{display:block;width:100%;margin-top:6px;padding:12px 14px;border-radius:var(--radius-control);border:1px solid var(--color-border);background:var(--color-canvas);font:18px/1.45 var(--sans);color:var(--color-ink);resize:none;transition:border-color .3s,box-shadow .3s}
+.seal-record textarea:focus,.seal-record input:focus{outline:none;border-color:var(--color-gold);box-shadow:var(--shadow-focus)}
+.seal-check{padding:28px 30px;border-radius:var(--radius-card);background:var(--color-footer-bg);color:var(--color-footer-title)}
+.seal-check p{font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--color-footer-text);margin-top:18px}
+.seal-check p:first-child{margin-top:0}
+.seal-check code{display:block;margin-top:8px;font:500 17px/1.5 ui-monospace,"SFMono-Regular",Menlo,monospace;color:var(--color-footer-link);word-break:break-all}
+.seal-check code.diff{color:var(--color-error)}
+.seal-status{display:flex;align-items:center;gap:12px;margin-top:22px;padding:14px 16px;border-radius:14px;font-size:19px;font-weight:600;background:color-mix(in srgb,var(--color-success) 22%,transparent);color:var(--color-sage-light);transition:background .4s}
+.seal-status.bad{background:color-mix(in srgb,var(--color-error) 32%,transparent);color:var(--color-footer-title);animation:shake .5s var(--ease-gentle)}
+.seal-status svg{width:24px;height:24px;flex:none;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+@keyframes shake{20%,60%{translate:-6px 0}40%,80%{translate:6px 0}}
+.seal-actions{display:flex;gap:10px;margin-top:18px}
+.btn{padding:11px 18px;border-radius:var(--radius-control);font-size:16px;font-weight:600;background:var(--color-gold);color:var(--color-ink);transition:background .25s,translate .25s}
+.btn:hover{background:var(--color-gold-light);translate:0 -2px}
+.btn.ghost{background:transparent;color:var(--color-footer-title);box-shadow:0 0 0 1px color-mix(in srgb,var(--color-footer-title) 30%,transparent)}
+.seal-where{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+
+/* ---------- Cartões ---------- */
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.card{padding:24px 24px 22px;border-radius:var(--radius-card);background:var(--color-surface);box-shadow:var(--shadow-sm),0 0 0 1px var(--color-border)}
+.card svg{width:34px;height:34px;fill:none;stroke:var(--color-gold-dark);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.card h3{font:500 22px/1.2 var(--serif);margin-top:14px}
+.card p{font-size:16px;line-height:1.48;color:var(--color-ink-soft);margin-top:8px}
+
+/* ---------- Arquitetura ---------- */
+.arch{display:grid;grid-template-columns:1fr 70px 1fr 70px 1fr 70px 1fr;align-items:stretch;margin-top:10px}
+.arch-node{padding:26px 24px;border-radius:var(--radius-card);background:var(--color-surface);box-shadow:var(--shadow-md),0 0 0 1px var(--color-border);opacity:0}
+.slide.active .arch-node{animation:rise .8s var(--ease-organic) both;animation-delay:calc(var(--i) * 260ms + 300ms)}
+.arch-node.dark-node{background:var(--color-footer-bg);color:var(--color-footer-title)}
+.arch-node .chip{margin-bottom:14px}
+.arch-node h3{font:500 26px/1.15 var(--serif)}
+.arch-node ul{list-style:none;margin-top:14px;display:flex;flex-direction:column;gap:8px}
+.arch-node li{font-size:16px;line-height:1.42;color:var(--color-ink-soft);padding-left:16px;position:relative}
+.arch-node li::before{content:"";position:absolute;left:0;top:.6em;width:6px;height:6px;border-radius:50%;background:var(--color-gold)}
+.arch-node.dark-node li{color:var(--color-footer-text)}
+.arch-link{position:relative;align-self:center;height:3px;margin:0 6px;background:repeating-linear-gradient(90deg,var(--color-gold) 0 10px,transparent 10px 18px);background-size:36px 3px}
+.slide.active .arch-link{animation:dash 1.2s linear infinite}
+@keyframes dash{to{background-position:36px 0}}
+.arch-link::after{content:"";position:absolute;right:-4px;top:-6px;border:7px solid transparent;border-left:10px solid var(--color-gold);border-right:0}
+.arch-link i{position:absolute;top:-5px;left:0;width:13px;height:13px;border-radius:50%;background:var(--color-gold-dark);box-shadow:0 0 0 4px color-mix(in srgb,var(--color-gold) 25%,transparent);opacity:0}
+.slide.active .arch-link i{animation:packet 2.2s var(--ease-gentle) infinite;animation-delay:calc(var(--i) * 450ms + 1.2s)}
+@keyframes packet{0%{left:0;opacity:0}15%{opacity:1}85%{opacity:1}100%{left:calc(100% - 13px);opacity:0}}
+.arch-rule{margin-top:28px}
+
+/* ---------- Próximos passos ---------- */
+.gate{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.gate .card{position:relative;padding-top:58px}
+.gate .card .chip{position:absolute;top:20px;left:24px}
+.next3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.next3 .card h3{font-size:26px}
+.next3 .card dl{margin-top:14px}
+.next3 .card dt{font:600 13px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--color-gold-ink);margin-top:16px}
+.next3 .card dd{font-size:16.5px;line-height:1.48;color:var(--color-ink-soft);margin-top:6px}
+.decisions{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:16px 30px}
+.decisions li{display:grid;grid-template-columns:40px 1fr;gap:16px;padding:20px 22px;border-radius:var(--radius-card);background:var(--color-surface);box-shadow:var(--shadow-sm),0 0 0 1px var(--color-border)}
+.decisions b{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--color-canvas-alt);color:var(--color-gold-ink);font:500 20px/1 var(--serif)}
+.decisions strong{display:block;font-size:19px;color:var(--color-ink)}
+.decisions span{display:block;font-size:16px;line-height:1.45;color:var(--color-ink-soft);margin-top:6px}
+
+/* ---------- Controles, índice, ajuda, ampliação ---------- */
+#progress{position:fixed;left:0;right:0;top:0;height:3px;z-index:20;background:color-mix(in srgb,var(--color-footer-title) 8%,transparent)}
+#progress i{display:block;height:100%;width:0;background:var(--color-gold);transition:width .5s var(--ease-organic)}
+#hud{position:fixed;right:16px;bottom:14px;z-index:21;display:flex;align-items:center;gap:2px;padding:5px;border-radius:999px;background:var(--glass);color:var(--color-footer-title);box-shadow:var(--shadow-lg);opacity:0;translate:0 10px;pointer-events:none;transition:opacity .3s,translate .3s}
+body.hud #hud,#hud:focus-within{opacity:1;translate:0 0;pointer-events:auto}
+#hud button{min-width:42px;height:42px;border-radius:999px;display:grid;place-items:center;padding:0 10px;transition:background .2s}
+#hud button:hover{background:color-mix(in srgb,var(--color-footer-title) 14%,transparent)}
+#hud svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+#hud-count{padding:0 8px;font:600 15px/1 var(--sans);font-variant-numeric:tabular-nums;white-space:nowrap}
+.overlay{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;padding:4vh 4vw;background:color-mix(in srgb,var(--color-footer-bg) 82%,transparent);backdrop-filter:blur(6px);opacity:0;transition:opacity .3s}
+.overlay[hidden]{display:none}
+.overlay.open{opacity:1}
+.panel{width:min(1240px,100%);max-height:100%;overflow:auto;border-radius:24px;background:var(--color-canvas);box-shadow:var(--shadow-lg);padding:34px 38px;translate:0 16px;transition:translate .35s var(--ease-organic)}
+.overlay.open .panel{translate:0 0}
+.panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
+.panel-head h2{font:500 34px/1.1 var(--serif)}
+.panel-head button{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:var(--color-canvas-alt)}
+.panel-head svg{width:18px;height:18px;fill:none;stroke:var(--color-ink);stroke-width:2.2}
+.index-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:26px 28px}
+.index-grid h3{font:600 13px/1.3 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--color-gold-ink);margin-bottom:8px}
+.index-grid ol{list-style:none;display:flex;flex-direction:column;gap:2px}
+.index-grid button{width:100%;display:grid;grid-template-columns:32px 1fr;gap:8px;padding:6px 8px;border-radius:8px;text-align:left;font-size:15px;line-height:1.35;color:var(--color-ink)}
+.index-grid button span{color:var(--color-ink-soft);font-variant-numeric:tabular-nums}
+.index-grid button:hover{background:var(--color-canvas-alt)}
+.index-grid button.current{background:var(--color-gold-light);font-weight:600}
+.help-list{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 40px;list-style:none;font-size:17px;color:var(--color-ink-soft)}
+.help-list li{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid var(--color-border)}
+.help-list kbd{color:var(--color-ink)}
+#lightbox{padding:3vh 3vw;cursor:zoom-out;align-items:flex-start;overflow:auto}
+#lightbox img{width:auto;max-width:min(1500px,94vw);height:auto;margin:auto;border-radius:16px;box-shadow:var(--shadow-lg);background:var(--color-canvas);scale:.96;transition:scale .35s var(--ease-organic)}
+#lightbox.open img{scale:1}
+#lightbox.fit-height img{max-height:94vh}
+#lightbox p{position:fixed;left:50%;bottom:18px;translate:-50% 0;padding:8px 16px;border-radius:999px;background:var(--glass);color:var(--color-footer-title);font-size:14px}
+#rotate{position:fixed;left:12px;right:12px;bottom:12px;z-index:25;display:none;align-items:center;gap:12px;padding:14px 16px;border-radius:16px;background:var(--glass);color:var(--color-footer-title);font-size:15px}
+#rotate button{margin-left:auto;padding:6px 12px;border-radius:999px;background:color-mix(in srgb,var(--color-footer-title) 14%,transparent)}
+@media (max-width:760px) and (orientation:portrait){#rotate.show{display:flex}}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .reveal,.shot,.mark,.flow-dot,.flow-steps .thumb,.flow-steps h3,.flow-steps .who,.flow-steps p,.arch-node{opacity:1!important;scale:none!important}
+  .flow-track i{scale:1 1}
+  .swap>.shot:not(.current){opacity:0!important}
+}
+@page{size:297mm 210mm;margin:0}
+@media print{
+  body{overflow:visible;background:var(--color-canvas)}
+  #deck{position:static}
+  .slide{position:relative;visibility:visible;opacity:1;width:297mm;height:210mm;break-after:page;overflow:hidden}
+  .canvas{left:0;top:0;margin:0;transform:none;zoom:.7559}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .reveal,.shot,.mark,.flow-dot,.flow-steps .thumb,.flow-steps h3,.flow-steps .who,.flow-steps p,.arch-node{opacity:1!important;scale:none!important}
+  #hud,#progress,.screen-only,.overlay,#rotate{display:none!important}
+}
+</style>
+</head>
+<body>
+<main id="deck">
+
+<!-- =========================================================== VISÃO GERAL -->
+<section class="slide dark cover" id="capa" data-chapter="inicio" data-title="Capa" data-foot="off">
+  <div class="canvas">
+    <img class="cover-logo reveal" src="img/brand-logo.webp" alt="Clínica Kavaná">
+    <div class="cover-text">
+      <p class="eyebrow light reveal" style="--d:150">Apresentação do sistema</p>
+      <h1 class="reveal" style="--d:260">Do pedido no site ao prontuário selado</h1>
+      <p class="cover-sub reveal" style="--d:400">Site, agenda, prontuários, documentos e gestão da Clínica Kavaná, num sistema só.</p>
+      <p class="cover-date reveal" style="--d:540">Outubro de 2026</p>
+    </div>
+    <div class="cover-art">
+      <figure class="shot cover-desktop" data-shot="site-inicio" data-path="kavana · início" data-marks="none" data-alt="Página inicial do site da Clínica Kavaná"></figure>
+      <figure class="shot phone cover-phone" data-shot="celular-agenda" data-marks="none" data-alt="Agenda do dia no celular"></figure>
+    </div>
+    <p class="cover-note reveal" style="--d:800">Telas reais do sistema, com dados fictícios de demonstração.</p>
+    <p class="cover-hint screen-only reveal" style="--d:1000"><kbd>→</kbd> ou <kbd>espaço</kbd> para avançar · <kbd>I</kbd> índice · <kbd>F</kbd> tela cheia · <kbd>?</kbd> atalhos</p>
+  </div>
+</section>
+
+<section class="slide" id="indice" data-chapter="inicio" data-title="Nesta apresentação">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Visão geral</p>
+      <h2 class="reveal" style="--d:80">Nesta apresentação</h2>
+      <p class="lead reveal" style="--d:160">Os capítulos seguem o caminho de um atendimento, do site à gestão. Clique em um deles para ir direto.</p>
+    </header>
+    <div class="body"><div class="chapter-cards" data-chapter-cards></div></div>
+  </div>
+</section>
+
+<section class="slide" id="visao-geral" data-chapter="inicio" data-title="Um sistema, três frentes">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Visão geral</p>
+      <h2 class="reveal" style="--d:80">Um sistema, três frentes</h2>
+      <p class="lead reveal" style="--d:160">O site e as telas da clínica usam a mesma agenda e as mesmas regras. Cada pessoa vê só o que precisa.</p>
+    </header>
+    <div class="body">
+      <div class="pillars">
+        <article class="pillar reveal" style="--d:300">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="18"/><path d="M6 24h36M24 6c5 5 7 11 7 18s-2 13-7 18M24 6c-5 5-7 11-7 18s2 13 7 18"/></svg>
+          <h3>Site da clínica</h3>
+          <p>Apresenta a clínica e recebe pedidos de agendamento com os horários reais da agenda. Com o agendamento online desligado, leva a pessoa ao WhatsApp.</p>
+        </article>
+        <article class="pillar reveal" style="--d:420">
+          <svg viewBox="0 0 48 48"><rect x="7" y="10" width="34" height="31" rx="5"/><path d="M7 19h34M16 6v8M32 6v8M15 27h6M27 27h6M15 34h6"/></svg>
+          <h3>Sistema da clínica</h3>
+          <p>Recepção, profissionais e administração trabalham na mesma agenda, com prontuários, tratamentos, documentos e financeiro.</p>
+        </article>
+        <article class="pillar reveal" style="--d:540">
+          <svg viewBox="0 0 48 48"><path d="M24 5l15 6v11c0 10-6 17-15 21-9-4-15-11-15-21V11z"/><path d="M17 24l5 5 9-10"/></svg>
+          <h3>Proteção dos dados</h3>
+          <p>Permissões por perfil, selo de integridade nos prontuários e documentos, e registro na auditoria de quem abriu o quê.</p>
+        </article>
+      </div>
+      <div class="stats">
+        <div class="stat reveal" style="--d:700"><b data-count="3">3</b><span>perfis de acesso: recepção, profissional e administração</span></div>
+        <div class="stat reveal" style="--d:780"><b data-count="5">5</b><span>tipos de documento, numerados e com cópia arquivada</span></div>
+        <div class="stat reveal" style="--d:860"><b data-count="171">171</b><span>testes automáticos na API, rodados a cada etapa</span></div>
+        <div class="stat reveal" style="--d:940"><b data-count="93">93</b><span>verificações feitas nas telas, do site ao painel</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="fluxo" data-chapter="inicio" data-title="O fluxo em uma imagem">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Visão geral</p>
+      <h2 class="reveal" style="--d:80">O fluxo em uma imagem</h2>
+      <p class="lead reveal" style="--d:160">Do pedido no site ao prontuário selado. Clique em uma etapa para ver as telas dela.</p>
+    </header>
+    <div class="body">
+      <div class="flow">
+        <div class="flow-track"><i></i></div>
+        <span class="flow-runner" aria-hidden="true"></span>
+        <ol class="flow-steps">
+          <li data-go="site-agendamento" style="--i:0" tabindex="0"><span class="flow-dot">1</span><figure class="thumb"><img src="img/agendar-4.webp" alt=""></figure><h3>Site</h3><span class="chip who">Paciente</span><p>Escolhe atendimento, profissional, dia e horário.</p></li>
+          <li data-go="recepcao-solicitacoes" style="--i:1" tabindex="0"><span class="flow-dot">2</span><figure class="thumb"><img src="img/recepcao-solicitacoes.webp" alt=""></figure><h3>Solicitação</h3><span class="chip who">Recepção</span><p>O pedido chega à recepção, sem marcar nada sozinho.</p></li>
+          <li data-go="recepcao-agenda-dia" style="--i:2" tabindex="0"><span class="flow-dot">3</span><figure class="thumb"><img src="img/recepcao-agenda-dia.webp" alt=""></figure><h3>Agenda</h3><span class="chip who">Recepção</span><p>Confirma com a pessoa e marca o horário.</p></li>
+          <li data-go="recepcao-depois" style="--i:3" tabindex="0"><span class="flow-dot">4</span><figure class="thumb"><img src="img/recepcao-atendimento.webp" alt=""></figure><h3>Atendimento</h3><span class="chip who">Recepção</span><p>Comparecimento, pagamento e declaração.</p></li>
+          <li data-go="medica-selado" style="--i:4" tabindex="0"><span class="flow-dot">5</span><figure class="thumb"><img src="img/medica-selado.webp" alt=""></figure><h3>Prontuário</h3><span class="chip who">Profissional</span><p>Registra, finaliza e o prontuário recebe o selo.</p></li>
+          <li data-go="painel" style="--i:5" tabindex="0"><span class="flow-dot">6</span><figure class="thumb"><img src="img/admin-painel.webp" alt=""></figure><h3>Gestão</h3><span class="chip who">Administração</span><p>Financeiro e painel, sem nenhum paciente no painel.</p></li>
+        </ol>
+        <p class="flow-rule reveal" style="--d:2700">Cada etapa acontece numa tela própria, com permissão para cada perfil. As ações importantes ficam registradas na <strong>auditoria</strong>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="perfis" data-chapter="inicio" data-title="Cada perfil vê só o que precisa">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Visão geral</p>
+      <h2 class="reveal" style="--d:80">Cada perfil vê só o que precisa</h2>
+      <p class="lead reveal" style="--d:160">O menu muda com o perfil de quem entra. O que não aparece no menu também é recusado pela API.</p>
+    </header>
+    <div class="body">
+      <div class="roles">
+        <div class="role reveal" style="--d:280">
+          <div><h3>Recepção</h3><p>Agenda, pedidos do site, pacientes, financeiro e profissionais. Não abre prontuários.</p></div>
+          <figure class="shot bare" data-shot="nav-recepcao" data-alt="Menu da recepção" style="--d:340"></figure>
+        </div>
+        <div class="role reveal" style="--d:420">
+          <div><h3>Profissional</h3><p>A própria agenda, os pacientes com atendimento marcado e os prontuários desses pacientes.</p></div>
+          <figure class="shot bare" data-shot="nav-profissional" data-alt="Menu do profissional" style="--d:480"></figure>
+        </div>
+        <div class="role reveal" style="--d:560">
+          <div><h3>Administração</h3><p>Tudo da recepção, mais painel, usuários, convênios e auditoria. Lê a parte compartilhada dos prontuários, com registro.</p></div>
+          <figure class="shot bare" data-shot="nav-admin" data-alt="Menu da administração" style="--d:620"></figure>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== SITE -->
+<section class="slide dark divider" id="cap-site" data-chapter="site" data-title="Site da clínica" data-summary="Apresenta a clínica e recebe pedidos de agendamento com os horários reais da agenda.">
+  <div class="canvas">
+    <span class="div-num reveal">01</span>
+    <div class="div-text">
+      <p class="eyebrow light reveal" style="--d:120">Capítulo 1</p>
+      <h2 class="reveal" style="--d:220">Site da clínica</h2>
+      <p class="div-lead reveal" style="--d:320">Apresenta a clínica e recebe pedidos de agendamento com os horários reais da agenda.</p>
+    </div>
+    <ol class="div-list" data-chapter-list="site"></ol>
+    <img class="div-tree" src="img/brand-tree-mark.webp" alt="" data-overflow-ok>
+  </div>
+</section>
+
+<section class="slide" id="site-inicio" data-chapter="site" data-title="A porta de entrada">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Site da clínica</p>
+      <h2 class="reveal" style="--d:80">A porta de entrada</h2>
+      <p class="lead reveal" style="--d:160">O site apresenta a clínica, as especialidades e a equipe, e leva ao agendamento. Funciona no computador e no celular.</p>
+    </header>
+    <div class="body split" style="--tw:380px">
+      <div class="side">
+        <ol class="legend">
+          <li data-mark="1"><p><strong>Agendar consulta</strong> fica sempre no topo e abre o agendamento em seis etapas.</p></li>
+          <li data-mark="2"><p><strong>WhatsApp da clínica</strong> em todas as páginas, para quem prefere conversar.</p></li>
+        </ol>
+        <p class="note">Os textos, as fotos e o contato do site são os que a clínica aprovou para o site.</p>
+      </div>
+      <div class="figs">
+        <figure class="shot" data-shot="site-inicio" data-path="kavana · início" data-alt="Página inicial do site" style="--fw:700px"></figure>
+        <figure class="shot phone" data-shot="celular-site" data-marks="none" data-alt="Página inicial no celular" style="--pw:190px;--d:420"></figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="site-agendamento" data-chapter="site" data-title="Agendar leva cerca de um minuto">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Site da clínica</p>
+      <h2 class="reveal" style="--d:80">Agendar leva cerca de um minuto</h2>
+      <p class="lead reveal" style="--d:160">Seis etapas curtas. A pessoa pode voltar e mudar qualquer escolha antes de confirmar. Clique nas etapas.</p>
+    </header>
+    <div class="body">
+      <div class="stepper" data-widget="stepper">
+        <ol class="stepper-tabs reveal" style="--d:260">
+          <li><button type="button" data-step="0"><b>1</b><div><strong>Atendimento</strong><span>Médico presencial, clínica geral, terapêutico ou psicologia.</span></div></button></li>
+          <li><button type="button" data-step="1"><b>2</b><div><strong>Profissional</strong><span>Um nome ou "Sem preferência". Só aparece quem a administração liberou para o site.</span></div></button></li>
+          <li><button type="button" data-step="2"><b>3</b><div><strong>Dia</strong><span>Os dias com horário livre nas próximas três semanas.</span></div></button></li>
+          <li><button type="button" data-step="3"><b>4</b><div><strong>Horário</strong><span>Só os horários realmente livres na agenda do profissional.</span></div></button></li>
+          <li><button type="button" data-step="4"><b>5</b><div><strong>Contato</strong><span>Nome, telefone e a autorização para a clínica entrar em contato.</span></div></button></li>
+          <li><button type="button" data-step="5"><b>6</b><div><strong>Confirmação</strong><span>Confere tudo e envia o pedido para a recepção.</span></div></button></li>
+        </ol>
+        <div class="swap">
+          <figure class="shot" data-shot="agendar-1" data-path="kavana · agendamento" data-frame="768/667" data-alt="Etapa 1: tipo de atendimento" style="--fw:740px"></figure>
+          <figure class="shot" data-shot="agendar-2" data-path="kavana · agendamento" data-frame="768/667" data-alt="Etapa 2: profissional" style="--fw:740px"></figure>
+          <figure class="shot" data-shot="agendar-3" data-path="kavana · agendamento" data-frame="768/667" data-alt="Etapa 3: dia" style="--fw:740px"></figure>
+          <figure class="shot" data-shot="agendar-4" data-path="kavana · agendamento" data-frame="768/667" data-alt="Etapa 4: horário" style="--fw:740px"></figure>
+          <figure class="shot" data-shot="agendar-5" data-path="kavana · agendamento" data-frame="768/667" data-alt="Etapa 5: contato e autorização" style="--fw:740px"></figure>
+          <figure class="shot" data-shot="agendar-6" data-path="kavana · agendamento" data-frame="768/667" data-alt="Etapa 6: confirmação" style="--fw:740px"></figure>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="site-horarios" data-chapter="site" data-title="Os horários vêm da agenda">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Site da clínica</p>
+      <h2 class="reveal" style="--d:80">Os horários vêm da agenda de verdade</h2>
+      <p class="lead reveal" style="--d:160">O site não inventa vagas: calcula na hora, a partir da agenda de cada profissional.</p>
+    </header>
+    <div class="body split" style="--tw:480px">
+      <div class="side">
+        <ol class="legend">
+          <li data-mark="1"><p><strong>Horário escolhido.</strong> A lista conta o horário de atendimento, a duração usual, os atendimentos marcados e os bloqueios.</p></li>
+        </ol>
+        <ul class="facts">
+          <li>Oferece de amanhã até <strong>21 dias</strong> à frente, só com os profissionais liberados pela administração.</li>
+          <li>Enquanto a recepção não responde um pedido, <strong>aquele horário some do site</strong> para as outras pessoas.</li>
+          <li>Limites contra abuso: <strong>5 pedidos a cada 10 minutos</strong> por endereço e <strong>3 por dia</strong> por telefone.</li>
+        </ul>
+      </div>
+      <figure class="shot" data-shot="agendar-4" data-path="kavana · agendamento" data-alt="Horários livres do dia escolhido" style="--fw:780px"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="site-pedido" data-chapter="site" data-title="Um pedido, não uma marcação">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Site da clínica</p>
+      <h2 class="reveal" style="--d:80">Um pedido, não uma marcação automática</h2>
+      <p class="lead reveal" style="--d:160">A pessoa autoriza o contato e recebe um código. Quem marca é a recepção, depois de falar com ela.</p>
+    </header>
+    <div class="body stack">
+      <div class="duo">
+        <figure class="shot" data-shot="agendar-5" data-path="kavana · agendamento" data-alt="Contato e autorização" data-frame="768/560"></figure>
+        <figure class="shot" data-shot="agendar-enviado" data-path="kavana · agendamento" data-alt="Solicitação enviada" data-frame="768/560" style="--d:420"></figure>
+      </div>
+      <ol class="legend cols sm">
+        <li data-shot="agendar-5" data-mark="2"><p><strong>Autorização de contato</strong>, guardada com a versão do texto aceito (site-v1).</p></li>
+        <li data-shot="agendar-enviado" data-mark="1"><p><strong>Só fica marcado depois da confirmação</strong> da recepção, por ligação ou WhatsApp.</p></li>
+        <li data-shot="agendar-5" data-mark="1"><p><strong>Telefone</strong> usado só para a clínica confirmar o atendimento.</p></li>
+        <li data-shot="agendar-enviado" data-mark="2"><p><strong>Código da solicitação</strong>, para a recepção achar o pedido.</p></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="site-interruptor" data-chapter="site" data-title="Agendamento online: ligado ou WhatsApp">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Site da clínica</p>
+      <h2 class="reveal" style="--d:80">Agendamento online: ligado ou WhatsApp</h2>
+      <p class="lead reveal" style="--d:160">O agendamento pelo site começa desligado. Quando a clínica quiser, é só ligar. Experimente o interruptor.</p>
+    </header>
+    <div class="body split" style="--tw:470px" data-widget="toggle" data-state="on">
+      <div class="side">
+        <button type="button" class="switch reveal" role="switch" aria-checked="true" style="--d:260"><span class="track"><span class="knob"></span></span><span>Agendamento pelo site</span></button>
+        <p class="state-text" data-for="on"><strong>Ligado:</strong> o pedido entra direto na lista da recepção, com os horários reais da agenda e um código para a pessoa.</p>
+        <p class="state-text" data-for="off"><strong>Desligado (padrão):</strong> a pessoa escolhe o horário e o site abre o WhatsApp da clínica com a mensagem pronta.</p>
+        <p class="note">A troca é uma configuração do servidor: o site e as telas não mudam.</p>
+      </div>
+      <div class="swap">
+        <figure class="shot current" data-shot="agendar-enviado" data-state-view="on" data-path="kavana · agendamento" data-frame="768/440" data-marks="none" data-alt="Ligado: solicitação enviada para a recepção" style="--fw:760px"></figure>
+        <figure class="shot" data-shot="whatsapp-enviar" data-state-view="off" data-path="kavana · agendamento" data-frame="768/440" data-marks="none" data-alt="Desligado: falta só enviar pelo WhatsApp" style="--fw:760px"></figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== RECEPÇÃO -->
+<section class="slide dark divider" id="cap-recepcao" data-chapter="recepcao" data-title="Recepção" data-summary="Agenda, pedidos do site, cadastro, comparecimento, pagamento e declarações.">
+  <div class="canvas">
+    <span class="div-num reveal">02</span>
+    <div class="div-text">
+      <p class="eyebrow light reveal" style="--d:120">Capítulo 2</p>
+      <h2 class="reveal" style="--d:220">Recepção</h2>
+      <p class="div-lead reveal" style="--d:320">Agenda, pedidos do site, cadastro, comparecimento, pagamento e declarações.</p>
+    </div>
+    <ol class="div-list" data-chapter-list="recepcao"></ol>
+    <img class="div-tree" src="img/brand-tree-mark.webp" alt="" data-overflow-ok>
+  </div>
+</section>
+
+<section class="slide" id="entrar" data-chapter="recepcao" data-title="Entrar no sistema">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Acesso</p>
+      <h2 class="reveal" style="--d:80">Entrar no sistema</h2>
+      <p class="lead reveal" style="--d:160">Cada pessoa da equipe tem o próprio acesso. O perfil define o que ela vê.</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ol class="legend">
+          <li data-mark="1"><p><strong>E-mail pessoal</strong>: nada de acesso compartilhado.</p></li>
+          <li data-mark="2"><p><strong>Senha protegida</strong> com Argon2; nunca fica guardada em texto.</p></li>
+          <li data-mark="3"><p><strong>Tentativas limitadas</strong>: 5 erros em 15 minutos pausam a conta.</p></li>
+        </ol>
+        <ul class="facts">
+          <li>A sessão termina depois de <strong>2 horas sem uso</strong> e dura no máximo <strong>12 horas</strong>.</li>
+          <li>No primeiro acesso, a <strong>senha provisória</strong> precisa ser trocada.</li>
+        </ul>
+      </div>
+      <figure class="shot" data-shot="entrar" data-path="kavana · sistema · entrar" data-alt="Tela de entrada do sistema"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="recepcao-agenda-dia" data-chapter="recepcao" data-title="A agenda do dia">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Recepção · Agenda</p>
+      <h2 class="reveal" style="--d:80">A agenda do dia</h2>
+      <p class="lead reveal" style="--d:160">Atendimentos, horários livres e bloqueios de cada profissional, na ordem do dia.</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ol class="legend">
+          <li data-mark="1"><p><strong>Profissional, dia e visão</strong> (dia ou semana).</p></li>
+          <li data-mark="2"><p><strong>Cada atendimento</strong>: paciente, tipo, modalidade, pagamento e situação.</p></li>
+          <li data-mark="3"><p><strong>Horário livre</strong>: um clique abre o agendamento já preenchido.</p></li>
+          <li data-mark="4"><p><strong>Bloqueio</strong> (curso, férias): some da agenda e do site.</p></li>
+        </ol>
+      </div>
+      <figure class="shot" data-shot="recepcao-agenda-dia" data-path="kavana · sistema · agenda" data-frame="1280/800" data-alt="Agenda do dia da médica"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="recepcao-agenda-semana" data-chapter="recepcao" data-title="A semana de cada profissional">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Recepção · Agenda</p>
+      <h2 class="reveal" style="--d:80">A semana de cada profissional</h2>
+      <p class="lead reveal" style="--d:160">A visão da semana mostra o ritmo da agenda: sessões semanais, bloqueios e a situação de cada atendimento.</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ol class="legend">
+          <li data-mark="1"><p><strong>Dia ou semana</strong>, com o mesmo filtro de profissional.</p></li>
+          <li data-mark="2"><p><strong>Bloqueio</strong> no dia (aqui, supervisão clínica).</p></li>
+          <li data-mark="3"><p><strong>Situação</strong>: agendado, confirmado, compareceu, faltou ou cancelado.</p></li>
+        </ol>
+      </div>
+      <figure class="shot" data-shot="recepcao-agenda-semana" data-path="kavana · sistema · agenda" data-frame="1280/800" data-alt="Agenda da semana da psicóloga"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="recepcao-novo" data-chapter="recepcao" data-title="Novo agendamento">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Recepção · Agenda</p>
+      <h2 class="reveal" style="--d:80">Novo agendamento</h2>
+      <p class="lead reveal" style="--d:160">Do horário livre ao atendimento marcado em uma tela, com particular ou convênio.</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ol class="legend">
+          <li data-mark="1"><p><strong>Paciente</strong> encontrado por nome ou CPF.</p></li>
+          <li data-mark="2"><p><strong>Dia, horário e duração</strong>, com a duração usual do profissional.</p></li>
+          <li data-mark="3"><p><strong>Particular ou convênio</strong>, com a carteirinha do paciente.</p></li>
+          <li data-mark="4"><p><strong>Encaixe</strong>: fora do horário de atendimento só quando a recepção escolhe.</p></li>
+        </ol>
+        <p class="note">O banco de dados não aceita dois atendimentos do mesmo profissional no mesmo horário, nem com dois cliques ao mesmo tempo.</p>
+      </div>
+      <figure class="shot" data-shot="recepcao-novo" data-path="kavana · sistema · agenda · novo" data-frame="1280/800" data-alt="Formulário de novo agendamento"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="recepcao-solicitacoes" data-chapter="recepcao" data-title="Solicitações do site">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Recepção · Site</p>
+      <h2 class="reveal" style="--d:80">Solicitações do site</h2>
+      <p class="lead reveal" style="--d:160">Os pedidos feitos no site esperam aqui. Nada fica marcado até a recepção agendar.</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ol class="legend sm">
+          <li data-mark="1"><p><strong>O pedido</strong>: horário, profissional, atendimento e contato.</p></li>
+          <li data-mark="2"><p><strong>Agendar</strong> abre a agenda já com o horário pedido.</p></li>
+          <li data-mark="3"><p><strong>WhatsApp</strong> com a mensagem pronta.</p></li>
+          <li data-mark="4"><p><strong>Cadastrar paciente</strong> com o nome e o telefone do pedido.</p></li>
+          <li data-mark="5"><p><strong>Tratadas nos últimos 30 dias</strong>: quem respondeu e o que virou.</p></li>
+        </ol>
+        <p class="note">Os pedidos são apagados 90 dias depois de recebidos.</p>
+      </div>
+      <figure class="shot" data-shot="recepcao-solicitacoes" data-path="kavana · sistema · solicitações" data-frame="1280/800" data-alt="Lista de solicitações do site"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="recepcao-whatsapp" data-chapter="recepcao" data-title="Mensagens prontas para o WhatsApp">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Recepção · WhatsApp</p>
+      <h2 class="reveal" style="--d:80">Mensagens prontas para o WhatsApp</h2>
+      <p class="lead reveal" style="--d:160">O sistema abre o WhatsApp da recepção com a mensagem escrita. Quem envia é a recepção, do número da clínica: <strong>não há envio automático</strong>.</p>
+    </header>
+    <div class="body">
+      <div class="chats" data-widget="chat">
+        <article class="chat reveal" style="--d:280">
+          <header class="chat-head"><img src="img/brand-tree-mark.webp" alt=""><div><strong>Resposta a um pedido do site</strong><small>botão "WhatsApp" na solicitação</small></div></header>
+          <div class="chat-body"><span class="chat-tag">mensagem pronta</span><p class="bubble" data-text="whatsappRequest"></p></div>
+        </article>
+        <article class="chat reveal" style="--d:420">
+          <header class="chat-head"><img src="img/brand-tree-mark.webp" alt=""><div><strong>Confirmação do atendimento</strong><small>botão "Confirmar pelo WhatsApp" no atendimento</small></div></header>
+          <div class="chat-body"><span class="chat-tag">mensagem pronta</span><p class="bubble" data-text="whatsappConfirmation"></p></div>
+        </article>
+      </div>
+      <p class="note gold reveal" style="--d:600">Os textos são provisórios: a clínica ajusta como preferir.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="recepcao-paciente" data-chapter="recepcao" data-title="Cadastro do paciente">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Recepção · Pacientes</p>
+      <h2 class="reveal" style="--d:80">Cadastro do paciente</h2>
+      <p class="lead reveal" style="--d:160">Os dados que a clínica precisa, sem excessos, com cuidado para nome social e menores de idade.</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ol class="legend">
+          <li data-mark="1"><p><strong>Nome social</strong>: quando existe, é o nome que aparece no sistema.</p></li>
+          <li data-mark="2"><p><strong>CPF</strong> validado e obrigatório a partir dos 18 anos.</p></li>
+          <li data-mark="3"><p><strong>Menor de idade</strong>: o responsável legal entra com CPF, telefone e vínculo.</p></li>
+        </ol>
+      </div>
+      <figure class="shot" data-shot="recepcao-paciente-novo" data-path="kavana · sistema · pacientes · novo" data-frame="1280/800" data-alt="Cadastro de paciente menor de idade"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="recepcao-ficha" data-chapter="recepcao" data-title="A ficha do paciente">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Recepção · Pacientes</p>
+      <h2 class="reveal" style="--d:80">A ficha do paciente</h2>
+      <p class="lead reveal" style="--d:160">Tudo o que é administrativo num lugar só. A ficha não mostra conteúdo clínico.</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ol class="legend sm">
+          <li data-mark="1"><p><strong>Dados</strong> e idade calculada.</p></li>
+          <li data-mark="2"><p><strong>Atendimentos</strong> passados e futuros.</p></li>
+          <li data-mark="3"><p><strong>Documentos</strong> emitidos e o botão para emitir um novo.</p></li>
+          <li data-mark="4"><p><strong>Convênios</strong>: carteirinhas com plano e validade.</p></li>
+          <li data-mark="5"><p><strong>Consentimentos</strong> com a versão do termo; revogar não apaga o histórico.</p></li>
+        </ol>
+      </div>
+      <figure class="shot" data-shot="recepcao-ficha" data-path="kavana · sistema · pacientes" data-frame="1280/800" data-alt="Ficha do paciente"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="recepcao-antes" data-chapter="recepcao" data-title="Antes do atendimento">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Recepção · Atendimento</p>
+      <h2 class="reveal" style="--d:80">Antes do atendimento</h2>
+      <p class="lead reveal" style="--d:160">Confirmar, remarcar ou cancelar, sempre com quem fez e quando.</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ol class="legend sm">
+          <li data-mark="1"><p><strong>Situação</strong>: agendado ou confirmado.</p></li>
+          <li data-mark="2"><p><strong>Cancelado pelo paciente ou pela clínica</strong>: o horário volta a ficar livre.</p></li>
+          <li data-mark="3"><p><strong>Comparecimento e falta</strong> só a partir do horário de início.</p></li>
+          <li data-mark="4"><p><strong>Confirmar pelo WhatsApp</strong> com a mensagem pronta.</p></li>
+          <li data-mark="5"><p><strong>Remarcar ou alterar</strong> horário, profissional ou pagamento.</p></li>
+        </ol>
+      </div>
+      <figure class="shot" data-shot="recepcao-atendimento-futuro" data-path="kavana · sistema · agenda · atendimento" data-frame="1280/800" data-alt="Atendimento confirmado, antes do horário"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="recepcao-depois" data-chapter="recepcao" data-title="Depois do atendimento">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Recepção · Atendimento</p>
+      <h2 class="reveal" style="--d:80">Depois do atendimento</h2>
+      <p class="lead reveal" style="--d:160">Comparecimento, pagamento e declaração na mesma página.</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ol class="legend">
+          <li data-mark="1"><p><strong>Compareceu</strong>: marcado pela recepção ou ao finalizar o prontuário.</p></li>
+          <li data-mark="2"><p><strong>Pagamento</strong>: valor, situação e forma (Pix, cartão, dinheiro ou transferência).</p></li>
+          <li data-mark="3"><p><strong>Correção</strong> possível, e registrada na auditoria.</p></li>
+          <li data-mark="4"><p><strong>Declaração de comparecimento</strong> em um clique.</p></li>
+        </ol>
+      </div>
+      <figure class="shot" data-shot="recepcao-atendimento" data-path="kavana · sistema · agenda · atendimento" data-frame="1280/800" data-alt="Atendimento com comparecimento e pagamento"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="recepcao-declaracao" data-chapter="recepcao" data-title="Declaração de comparecimento">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Recepção · Documentos</p>
+      <h2 class="reveal" style="--d:80">Declaração de comparecimento</h2>
+      <p class="lead reveal" style="--d:160">Diz só que a pessoa esteve na clínica <strong>"para atendimento"</strong>: nunca a especialidade, como psicologia.</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ol class="legend">
+          <li data-mark="1"><p><strong>Número</strong> sequencial do ano, único para todos os documentos.</p></li>
+          <li data-mark="2"><p><strong>Cópia arquivada</strong> no sistema, com selo de integridade.</p></li>
+        </ol>
+        <ul class="facts">
+          <li>Finalidade e destinatário ficam no documento.</li>
+          <li>Cancelar pede um motivo; o documento não some.</li>
+        </ul>
+      </div>
+      <figure class="shot" data-shot="recepcao-declaracao" data-path="kavana · sistema · documentos" data-alt="Declaração de comparecimento" style="--fw:800px"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="celular" data-chapter="recepcao" data-title="Também no celular">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">No dia a dia</p>
+      <h2 class="reveal" style="--d:80">Também no celular</h2>
+      <p class="lead reveal" style="--d:160">As mesmas telas se ajustam à tela pequena, sem rolagem para os lados.</p>
+    </header>
+    <div class="body">
+      <div class="phones">
+        <div class="item"><figure class="shot phone" data-shot="celular-site" data-alt="Site no celular"></figure><p class="caption">Site</p></div>
+        <div class="item"><figure class="shot phone" data-shot="celular-agenda" data-alt="Agenda do dia no celular"></figure><p class="caption">Agenda do dia</p></div>
+        <div class="item"><figure class="shot phone" data-shot="celular-solicitacoes" data-alt="Solicitações do site no celular"></figure><p class="caption">Solicitações do site</p></div>
+        <div class="item"><figure class="shot phone" data-shot="celular-prontuario" data-alt="Prontuário finalizado no celular"></figure><p class="caption">Prontuário</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== MÉDICA -->
+<section class="slide dark divider" id="cap-medica" data-chapter="medica" data-title="Consulta médica" data-summary="A agenda, o prontuário com CID-10, o selo, os adendos, a impressão e os documentos.">
+  <div class="canvas">
+    <span class="div-num reveal">03</span>
+    <div class="div-text">
+      <p class="eyebrow light reveal" style="--d:120">Capítulo 3</p>
+      <h2 class="reveal" style="--d:220">Consulta médica</h2>
+      <p class="div-lead reveal" style="--d:320">A agenda, o prontuário com CID-10, o selo, os adendos, a impressão e os documentos.</p>
+    </div>
+    <ol class="div-list" data-chapter-list="medica"></ol>
+    <img class="div-tree" src="img/brand-tree-mark.webp" alt="" data-overflow-ok>
+  </div>
+</section>
+
+<section class="slide" id="medica-agenda" data-chapter="medica" data-title="A agenda da médica">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Profissional · Agenda</p>
+      <h2 class="reveal" style="--d:80">A agenda da médica</h2>
+      <p class="lead reveal" style="--d:160">Cada profissional vê só a própria agenda e os próprios pacientes. Marcar e desmarcar fica com a recepção.</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ol class="legend">
+          <li data-mark="1"><p><strong>Atendimento</strong>: abre a página do atendimento e, dela, o prontuário.</p></li>
+        </ol>
+        <ul class="facts">
+          <li>O profissional só abre pacientes com atendimento marcado com ele, passado ou futuro.</li>
+          <li>O menu tem só Início, Agenda, Pacientes e Prontuários.</li>
+        </ul>
+      </div>
+      <figure class="shot" data-shot="medica-agenda" data-path="kavana · sistema · minha agenda" data-frame="1280/800" data-alt="Agenda do dia da médica"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="medica-prontuario" data-chapter="medica" data-title="O prontuário em edição">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Profissional · Prontuário</p>
+      <h2 class="reveal" style="--d:80">O prontuário em edição</h2>
+      <p class="lead reveal" style="--d:160">Seções da consulta médica, salvas sozinhas enquanto a médica escreve.</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ol class="legend sm">
+          <li data-mark="1"><p><strong>Anamnese</strong>, exame físico, diagnóstico e conduta, em seções.</p></li>
+          <li data-mark="2"><p><strong>CID-10</strong> escolhido na tabela oficial.</p></li>
+          <li data-mark="3"><p><strong>Salvo sozinho</strong>, com a hora do último salvamento.</p></li>
+          <li data-mark="4"><p><strong>Anotações restritas</strong>: só a autora lê.</p></li>
+          <li data-mark="5"><p><strong>Finalizar</strong> sela o prontuário.</p></li>
+        </ol>
+      </div>
+      <figure class="shot" data-shot="medica-prontuario" data-path="kavana · sistema · prontuário" data-frame="1280/800" data-alt="Prontuário médico em edição"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="medica-cid" data-chapter="medica" data-title="Busca do CID-10">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Profissional · Prontuário</p>
+      <h2 class="reveal" style="--d:80">Busca do CID-10</h2>
+      <p class="lead reveal" style="--d:160">A tabela oficial do DATASUS, pesquisável por código ou por nome.</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ol class="legend">
+          <li data-mark="1"><p><strong>Código ou nome</strong>, com ou sem acento: "cefale" já encontra.</p></li>
+          <li data-mark="2"><p><strong>Resultados</strong> da tabela CID-10 oficial, escolhidos com o teclado ou o mouse.</p></li>
+        </ol>
+        <p class="note">Na consulta médica, o CID é obrigatório para finalizar.</p>
+      </div>
+      <figure class="shot" data-shot="medica-cid" data-path="kavana · sistema · prontuário" data-alt="Busca do CID-10 com resultados"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="medica-selado" data-chapter="medica" data-title="Finalizado e selado">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Profissional · Prontuário</p>
+      <h2 class="reveal" style="--d:80">Finalizado e selado</h2>
+      <p class="lead reveal" style="--d:160">Depois de finalizado, o prontuário não muda mais. O selo mostra que nada foi alterado.</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ol class="legend sm">
+          <li data-mark="1"><p><strong>Finalizado</strong> com data e hora; o selo é conferido sempre que o prontuário abre.</p></li>
+          <li data-mark="2"><p><strong>Anotações restritas</strong>, visíveis só para a autora.</p></li>
+          <li data-mark="3"><p><strong>Adendos</strong> depois da finalização.</p></li>
+          <li data-mark="4"><p><strong>Imprimir</strong> com ou sem as anotações restritas.</p></li>
+        </ol>
+        <ul class="facts">
+          <li>Só finaliza depois do horário de início, com o CID e com o registro no conselho.</li>
+        </ul>
+      </div>
+      <figure class="shot" data-shot="medica-selado" data-path="kavana · sistema · prontuário" data-frame="1280/800" data-alt="Prontuário médico finalizado e selado"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="medica-adendo" data-chapter="medica" data-title="Corrigir sem apagar: o adendo">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Profissional · Prontuário</p>
+      <h2 class="reveal" style="--d:80">Corrigir sem apagar: o adendo</h2>
+      <p class="lead reveal" style="--d:160">Uma correção ou um complemento entra como adendo, com selo próprio. O prontuário original continua igual.</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ol class="legend">
+          <li data-mark="1"><p><strong>Adendo</strong> com data, autora, registro no conselho e selo conferido.</p></li>
+          <li data-mark="2"><p><strong>Novo adendo</strong>: o texto entra abaixo, sem mexer no que já foi finalizado.</p></li>
+        </ol>
+      </div>
+      <figure class="shot" data-shot="medica-adendo" data-path="kavana · sistema · prontuário" data-alt="Adendos do prontuário"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="medica-impressao" data-chapter="medica" data-title="Impressão em A4">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Profissional · Prontuário</p>
+      <h2 class="reveal" style="--d:80">Impressão em A4</h2>
+      <p class="lead reveal" style="--d:160">Pronta para imprimir ou salvar em PDF pelo navegador, com a identidade da clínica.</p>
+    </header>
+    <div class="body split" style="--tw:minmax(0,1fr)">
+      <div class="side">
+        <ol class="legend">
+          <li data-mark="1"><p><strong>Identificação</strong> do paciente, do atendimento e da profissional, com o registro no conselho.</p></li>
+          <li data-mark="2"><p><strong>Finalização e selo</strong> impressos.</p></li>
+          <li data-mark="3"><p><strong>Assinatura e carimbo</strong>.</p></li>
+          <li data-mark="4"><p><strong>Rodapé</strong>: quem imprimiu e quando.</p></li>
+        </ol>
+        <p class="note">Até a assinatura digital ICP-Brasil (próximos passos), a clínica imprime e assina à mão.</p>
+      </div>
+      <figure class="shot" data-shot="medica-impressao" data-path="kavana · sistema · imprimir" data-frame="768/1010" data-alt="Prontuário em formato de impressão" style="--fw:500px"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="prontuarios" data-chapter="medica" data-title="Prontuários do paciente">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Profissional · Prontuários</p>
+      <h2 class="reveal" style="--d:80">Prontuários: o histórico do paciente</h2>
+      <p class="lead reveal" style="--d:160">A médica lê a parte compartilhada dos outros profissionais do paciente (a psicóloga, por exemplo) e tudo o que é dela.</p>
+    </header>
+    <div class="body stack">
+      <div class="duo">
+        <figure class="shot" data-shot="medica-prontuarios" data-path="kavana · sistema · prontuários" data-frame="1280/760" data-alt="Lista de prontuários"></figure>
+        <figure class="shot" data-shot="medica-linha-do-tempo" data-path="kavana · sistema · prontuários · paciente" data-frame="1280/760" data-alt="Histórico do paciente" style="--d:420"></figure>
+      </div>
+      <ol class="legend cols sm">
+        <li data-shot="medica-prontuarios" data-mark="1"><p><strong>Busca</strong> por nome ou CPF.</p></li>
+        <li data-shot="medica-linha-do-tempo" data-mark="2"><p><strong>Tratamentos</strong> de psicologia e terapia do paciente.</p></li>
+        <li data-shot="medica-prontuarios" data-mark="2"><p><strong>Prontuários finalizados</strong> de cada paciente.</p></li>
+        <li data-shot="medica-linha-do-tempo" data-mark="1"><p><strong>Exportar em PDF</strong>, com ou sem as próprias anotações restritas.</p></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="prontuario-exportar" data-chapter="medica" data-title="Exportação do prontuário">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Profissional · Prontuários</p>
+      <h2 class="reveal" style="--d:80">Exportação do prontuário</h2>
+      <p class="lead reveal" style="--d:160">O prontuário completo do paciente em um documento, com tratamentos e cada atendimento em ordem.</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ul class="facts" style="margin-top:0;padding-top:0;border:0">
+          <li>Por padrão, só a <strong>parte compartilhada</strong>. As anotações restritas da própria autora entram só se ela pedir.</li>
+          <li>Cada prontuário vem com o <strong>selo conferido</strong>.</li>
+          <li>A exportação fica <strong>registrada na auditoria</strong>.</li>
+          <li>Salva em PDF pelo próprio navegador.</li>
+        </ul>
+        <p class="note">Role a tela ao lado com o mouse para ver o documento inteiro.</p>
+      </div>
+      <figure class="shot" data-shot="medica-exportar" data-path="kavana · sistema · exportar" data-frame="1280/800" data-alt="Prontuário exportado do paciente"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="documentos" data-chapter="medica" data-title="Documentos emitidos">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Profissional · Documentos</p>
+      <h2 class="reveal" style="--d:80">Documentos emitidos</h2>
+      <p class="lead reveal" style="--d:160">Atestado, receita, relatório, declaração e relatório de cobrança, com número e cópia arquivada.</p>
+    </header>
+    <div class="body split" style="--tw:400px">
+      <div class="side">
+        <ul class="facts" style="margin-top:0;padding-top:0;border:0">
+          <li><strong>Atestado e receita</strong> só para médicos.</li>
+          <li>O <strong>CID no atestado</strong> só com a autorização do paciente.</li>
+          <li><strong>Relatório de cobrança</strong> para o convênio, com os atendimentos do período.</li>
+          <li>Numeração única por ano e <strong>cópia arquivada com selo</strong>.</li>
+          <li>Os textos-modelo são provisórios: a clínica revisa.</li>
+        </ul>
+      </div>
+      <div class="figs" style="flex-direction:column;align-items:center;gap:20px">
+        <figure class="shot" data-shot="medica-atestado" data-path="kavana · sistema · documentos" data-alt="Atestado médico" data-frame="768/380" style="--fw:560px;flex:none"></figure>
+        <figure class="shot" data-shot="medica-receita" data-path="kavana · sistema · documentos" data-alt="Receita" data-frame="768/380" style="--fw:560px;flex:none;--d:420"></figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== PSICOLOGIA E TERAPIAS -->
+<section class="slide dark divider" id="cap-terapias" data-chapter="terapias" data-title="Psicologia e terapias" data-summary="Processos e tratamentos com sessões, duas camadas de registro e encerramento selado.">
+  <div class="canvas">
+    <span class="div-num reveal">04</span>
+    <div class="div-text">
+      <p class="eyebrow light reveal" style="--d:120">Capítulo 4</p>
+      <h2 class="reveal" style="--d:220">Psicologia e terapias</h2>
+      <p class="div-lead reveal" style="--d:320">Processos e tratamentos com sessões, duas camadas de registro e encerramento selado.</p>
+    </div>
+    <ol class="div-list" data-chapter-list="terapias"></ol>
+    <img class="div-tree" src="img/brand-tree-mark.webp" alt="" data-overflow-ok>
+  </div>
+</section>
+
+<section class="slide" id="psicologia-processo" data-chapter="terapias" data-title="O processo psicológico">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Psicologia</p>
+      <h2 class="reveal" style="--d:80">O processo psicológico</h2>
+      <p class="lead reveal" style="--d:160">Abertura, sessões e encerramento, como pede a Resolução CFP 001/2009.</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ol class="legend sm">
+          <li data-mark="1"><p><strong>Abertura</strong>: avaliação da demanda e objetivos do trabalho.</p></li>
+          <li data-mark="2"><p><strong>Registro documental restrito</strong>: só a psicóloga autora lê.</p></li>
+          <li data-mark="3"><p><strong>Sessões</strong> do processo, cada uma com o seu registro.</p></li>
+          <li data-mark="4"><p><strong>Encerrar ou encaminhar</strong>, com motivo e registro.</p></li>
+        </ol>
+      </div>
+      <figure class="shot" data-shot="psicologa-processo" data-path="kavana · sistema · tratamentos" data-frame="1280/800" data-alt="Processo psicológico em andamento"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="psicologia-sessao" data-chapter="terapias" data-title="Cada sessão, um registro selado">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Psicologia</p>
+      <h2 class="reveal" style="--d:80">Cada sessão, um registro selado</h2>
+      <p class="lead reveal" style="--d:160">A sessão mostra o processo a que pertence e guarda a evolução e os procedimentos.</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ol class="legend">
+          <li data-mark="1"><p><strong>Registro restrito</strong> do processo, visível só para a autora.</p></li>
+          <li data-mark="2"><p><strong>Evolução e procedimentos</strong> da sessão.</p></li>
+          <li data-mark="3"><p><strong>Finalizada</strong> com selo de integridade.</p></li>
+        </ol>
+      </div>
+      <figure class="shot" data-shot="psicologa-sessao" data-path="kavana · sistema · prontuário" data-frame="1280/800" data-alt="Sessão de psicologia finalizada"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="psicologia-camadas" data-chapter="terapias" data-title="Duas camadas, cada uma para quem pode">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Psicologia</p>
+      <h2 class="reveal" style="--d:80">Duas camadas, cada uma para quem pode</h2>
+      <p class="lead reveal" style="--d:160">O mesmo processo, visto pela autora e pela administração. Troque a visão.</p>
+    </header>
+    <div class="body split" style="--tw:440px" data-widget="viewas" data-state="author">
+      <div class="side">
+        <div class="seg reveal" role="group" aria-label="Ver como" style="--d:260">
+          <button type="button" data-set="author" aria-pressed="true">Psicóloga (autora)</button>
+          <button type="button" data-set="admin" aria-pressed="false">Administração</button>
+        </div>
+        <p class="state-text" data-for="author">A autora vê a abertura, as sessões e o <strong>registro documental restrito</strong>, que só ela lê.</p>
+        <p class="state-text" data-for="admin">A administração vê só a <strong>parte compartilhada</strong>. O registro restrito não aparece, e a leitura entra na auditoria.</p>
+        <p class="note">Outros profissionais do paciente também leem só a parte compartilhada.</p>
+      </div>
+      <div class="swap">
+        <figure class="shot current" data-shot="psicologa-processo-resumo" data-state-view="author" data-path="kavana · sistema · tratamentos" data-frame="768/497" data-marks="none" data-alt="Processo visto pela psicóloga autora" style="--fw:780px"></figure>
+        <figure class="shot" data-shot="admin-processo-resumo" data-state-view="admin" data-path="kavana · sistema · tratamentos" data-frame="768/497" data-alt="Processo visto pela administração" style="--fw:780px"></figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="psicologia-encerramento" data-chapter="terapias" data-title="Encerramento selado">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Psicologia</p>
+      <h2 class="reveal" style="--d:80">Encerramento selado</h2>
+      <p class="lead reveal" style="--d:160">Encerrado, o processo não muda mais. Se a pessoa voltar, abre-se um novo.</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ol class="legend">
+          <li data-mark="1"><p><strong>Encerrado</strong>, com as sessões do processo.</p></li>
+          <li data-mark="2"><p><strong>Motivo e registro</strong>: alta, encaminhamento, interrupção ou outro.</p></li>
+          <li data-mark="3"><p><strong>Selo</strong> do processo inteiro, conferido a cada abertura.</p></li>
+        </ol>
+      </div>
+      <figure class="shot" data-shot="psicologa-encerrado" data-path="kavana · sistema · tratamentos" data-frame="1280/800" data-alt="Processo psicológico encerrado com alta"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="psicologia-relatorio" data-chapter="terapias" data-title="Documentos da psicologia">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Psicologia</p>
+      <h2 class="reveal" style="--d:80">Documentos da psicologia</h2>
+      <p class="lead reveal" style="--d:160">Declaração e relatório psicológico com número, finalidade e destinatário (Resolução CFP 06/2019).</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ul class="facts" style="margin-top:0;padding-top:0;border:0">
+          <li>O relatório é emitido pela psicóloga, com o registro no CRP.</li>
+          <li>A recepção não abre documentos com conteúdo clínico.</li>
+          <li>Cópia arquivada com selo, como todos os documentos.</li>
+          <li>Os textos-modelo são provisórios: a clínica revisa.</li>
+        </ul>
+      </div>
+      <figure class="shot" data-shot="psicologa-relatorio" data-path="kavana · sistema · documentos" data-alt="Relatório psicológico" style="--fw:800px"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="terapia" data-chapter="terapias" data-title="Tratamentos de terapia">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Terapias</p>
+      <h2 class="reveal" style="--d:80">Tratamentos de terapia</h2>
+      <p class="lead reveal" style="--d:160">O mesmo cuidado para as terapias: abertura, sessões, anotações restritas e encerramento.</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ol class="legend">
+          <li data-mark="1"><p><strong>Abertura</strong>: avaliação inicial e plano terapêutico.</p></li>
+          <li data-mark="2"><p><strong>Anotações restritas</strong> da terapeuta.</p></li>
+          <li data-mark="3"><p><strong>Encerrar ou encaminhar</strong>, com selo.</p></li>
+        </ol>
+        <p class="note">Diagnóstico só nas áreas com conselho (fisioterapia, terapia ocupacional, fonoaudiologia). Nas terapias integrativas, não.</p>
+      </div>
+      <figure class="shot" data-shot="terapeuta-tratamento" data-path="kavana · sistema · tratamentos" data-frame="1280/800" data-alt="Tratamento terapêutico"></figure>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== ADMINISTRAÇÃO -->
+<section class="slide dark divider" id="cap-gestao" data-chapter="gestao" data-title="Administração" data-summary="Painel, financeiro, equipe, horários, usuários, convênios e auditoria.">
+  <div class="canvas">
+    <span class="div-num reveal">05</span>
+    <div class="div-text">
+      <p class="eyebrow light reveal" style="--d:120">Capítulo 5</p>
+      <h2 class="reveal" style="--d:220">Administração</h2>
+      <p class="div-lead reveal" style="--d:320">Painel, financeiro, equipe, horários, usuários, convênios e auditoria.</p>
+    </div>
+    <ol class="div-list" data-chapter-list="gestao"></ol>
+    <img class="div-tree" src="img/brand-tree-mark.webp" alt="" data-overflow-ok>
+  </div>
+</section>
+
+<section class="slide" id="painel" data-chapter="gestao" data-title="Painel da clínica">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Administração</p>
+      <h2 class="reveal" style="--d:80">Painel da clínica</h2>
+      <p class="lead reveal" style="--d:160">Só números: nenhum nome de paciente e nenhum dado clínico. Aqui, duas semanas de demonstração.</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ol class="legend">
+          <li data-mark="1"><p><strong>Comparecimento</strong> e faltas do período.</p></li>
+          <li data-mark="2"><p><strong>Financeiro</strong>: recebido, em aberto e glosado.</p></li>
+          <li data-mark="3"><p><strong>Por profissional</strong>, com a ocupação da agenda.</p></li>
+          <li data-mark="4"><p><strong>Pedidos pelo site</strong>: recebidos, agendados e recusados.</p></li>
+        </ol>
+      </div>
+      <figure class="shot" data-shot="admin-painel" data-path="kavana · sistema · painel" data-frame="1280/800" data-alt="Painel da administração"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="financeiro" data-chapter="gestao" data-title="Financeiro">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Recepção e administração</p>
+      <h2 class="reveal" style="--d:80">Financeiro</h2>
+      <p class="lead reveal" style="--d:160">Atendimentos com comparecimento ou falta no período, particulares e por convênio.</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ol class="legend">
+          <li data-mark="1"><p><strong>Filtros</strong> por período, profissional, tipo e situação.</p></li>
+          <li data-mark="2"><p><strong>Totais</strong>: recebido e em aberto.</p></li>
+          <li data-mark="3"><p><strong>Glosa</strong> do convênio, à vista.</p></li>
+          <li data-mark="4"><p><strong>Falta</strong> com o valor pendente.</p></li>
+        </ol>
+        <p class="note">Valor e pagamento são registrados na página de cada atendimento.</p>
+      </div>
+      <figure class="shot" data-shot="recepcao-financeiro" data-path="kavana · sistema · financeiro" data-frame="1280/800" data-alt="Financeiro do período"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="profissionais" data-chapter="gestao" data-title="Profissionais">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Administração · Equipe</p>
+      <h2 class="reveal" style="--d:80">Profissionais</h2>
+      <p class="lead reveal" style="--d:160">O cadastro de cada profissional define o prontuário que ele usa e o que aparece no site.</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ol class="legend sm">
+          <li data-mark="1"><p><strong>Profissão</strong> e, nas terapias, a área.</p></li>
+          <li data-mark="2"><p><strong>Registro no conselho</strong> (CRM, CRP, CREFITO, CRFa): obrigatório para finalizar prontuários.</p></li>
+          <li data-mark="3"><p><strong>Pedidos pelo site</strong>: só quem a administração libera aparece no agendamento online.</p></li>
+          <li data-mark="4"><p><strong>Perfil do site</strong>: liga o profissional à foto publicada no site.</p></li>
+        </ol>
+      </div>
+      <figure class="shot" data-shot="admin-profissional" data-path="kavana · sistema · profissionais" data-frame="1280/800" data-alt="Cadastro de profissional"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="horarios" data-chapter="gestao" data-title="Horários e bloqueios">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Administração · Agenda</p>
+      <h2 class="reveal" style="--d:80">Horários e bloqueios</h2>
+      <p class="lead reveal" style="--d:160">A base de tudo: dos horários de cada profissional saem a agenda e as vagas do site.</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ol class="legend sm">
+          <li data-mark="1"><p><strong>Duração usual</strong>: divide os horários em vagas.</p></li>
+          <li data-mark="2"><p><strong>Períodos de atendimento</strong> por dia da semana.</p></li>
+          <li data-mark="3"><p><strong>Bloqueios</strong> de um período (curso, férias).</p></li>
+          <li data-mark="4"><p><strong>Motivo administrativo</strong>, nunca informação de saúde.</p></li>
+        </ol>
+        <p class="note">Um bloqueio nunca esconde um atendimento: antes, a recepção remarca ou cancela.</p>
+      </div>
+      <figure class="shot" data-shot="admin-horarios" data-path="kavana · sistema · horários" data-frame="1280/800" data-alt="Horários de atendimento e bloqueios"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="usuarios" data-chapter="gestao" data-title="Usuários e senhas provisórias">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Administração · Acessos</p>
+      <h2 class="reveal" style="--d:80">Usuários e senhas provisórias</h2>
+      <p class="lead reveal" style="--d:160">A administração cria o acesso; a pessoa escolhe a própria senha no primeiro acesso.</p>
+    </header>
+    <div class="body stack">
+      <div class="duo">
+        <figure class="shot" data-shot="admin-usuarios" data-path="kavana · sistema · usuários" data-frame="1280/800" data-alt="Usuários e senha provisória"></figure>
+        <figure class="shot" data-shot="conta-senha" data-path="kavana · sistema · conta · senha" data-frame="1280/800" data-alt="Troca obrigatória de senha" style="--d:420"></figure>
+      </div>
+      <ol class="legend cols sm">
+        <li data-shot="admin-usuarios" data-mark="1"><p><strong>Senha provisória</strong> mostrada uma vez só, para entregar à pessoa.</p></li>
+        <li><p><strong>Troca obrigatória</strong> no primeiro acesso. Perfis: administração, recepção e profissional.</p></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="convenios" data-chapter="gestao" data-title="Convênios">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Administração · Convênios</p>
+      <h2 class="reveal" style="--d:80">Convênios, do cadastro ao painel</h2>
+      <p class="lead reveal" style="--d:160">As operadoras que a clínica atende, ligadas a cada etapa.</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ul class="facts" style="margin-top:0;padding-top:0;border:0">
+          <li><strong>Operadoras</strong> com registro na ANS, quando houver.</li>
+          <li>No paciente, a <strong>carteirinha</strong> com plano, número e validade.</li>
+          <li>No agendamento, <strong>particular ou convênio</strong>.</li>
+          <li>No pagamento: faturado, recebido ou <strong>glosado</strong>.</li>
+          <li>No painel, os totais <strong>por convênio</strong>.</li>
+        </ul>
+      </div>
+      <figure class="shot" data-shot="admin-convenios" data-path="kavana · sistema · convênios" data-alt="Lista de convênios"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="auditoria" data-chapter="gestao" data-title="Auditoria">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Administração · Auditoria</p>
+      <h2 class="reveal" style="--d:80">Auditoria</h2>
+      <p class="lead reveal" style="--d:160">Quem fez o quê e quando, para responder a qualquer pergunta sobre os dados.</p>
+    </header>
+    <div class="body split">
+      <div class="side">
+        <ol class="legend">
+          <li data-mark="1"><p><strong>Nenhum conteúdo clínico</strong>: só quem, quando e o quê.</p></li>
+          <li data-mark="2"><p><strong>Leituras sensíveis</strong> registradas: ficha do paciente, prontuários, tratamentos e exportações.</p></li>
+        </ol>
+        <ul class="facts">
+          <li>Também ficam registradas as entradas no sistema, as tentativas erradas e as mudanças de cadastro.</li>
+        </ul>
+      </div>
+      <figure class="shot" data-shot="admin-auditoria" data-path="kavana · sistema · auditoria" data-alt="Registros da auditoria"></figure>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== SEGURANÇA -->
+<section class="slide dark divider" id="cap-seguranca" data-chapter="seguranca" data-title="Segurança e LGPD" data-summary="Quem vê o quê, o selo de integridade e a privacidade desde o desenho.">
+  <div class="canvas">
+    <span class="div-num reveal">06</span>
+    <div class="div-text">
+      <p class="eyebrow light reveal" style="--d:120">Capítulo 6</p>
+      <h2 class="reveal" style="--d:220">Segurança e LGPD</h2>
+      <p class="div-lead reveal" style="--d:320">Quem vê o quê, o selo de integridade e a privacidade desde o desenho.</p>
+    </div>
+    <ol class="div-list" data-chapter-list="seguranca"></ol>
+    <img class="div-tree" src="img/brand-tree-mark.webp" alt="" data-overflow-ok>
+  </div>
+</section>
+
+<section class="slide" id="quem-ve" data-chapter="seguranca" data-title="Quem vê o quê">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Segurança e LGPD</p>
+      <h2 class="reveal" style="--d:80">Quem vê o quê</h2>
+      <p class="lead reveal" style="--d:160">A API confere cada pedido pelo perfil de quem está entrando. Escolha um perfil.</p>
+    </header>
+    <div class="body">
+      <div class="matrix reveal" data-widget="matrix" data-role="all" style="--d:260">
+        <div class="seg" role="group" aria-label="Perfil">
+          <button type="button" data-set="all" aria-pressed="true">Todos</button>
+          <button type="button" data-set="r" aria-pressed="false">Recepção</button>
+          <button type="button" data-set="m" aria-pressed="false">Médico(a)</button>
+          <button type="button" data-set="p" aria-pressed="false">Psicólogo(a)</button>
+          <button type="button" data-set="t" aria-pressed="false">Terapeuta</button>
+          <button type="button" data-set="a" aria-pressed="false">Administração</button>
+        </div>
+        <table>
+          <thead><tr><th></th><th data-col="r">Recepção</th><th data-col="m">Médico(a)</th><th data-col="p">Psicólogo(a)</th><th data-col="t">Terapeuta</th><th data-col="a">Administração</th></tr></thead>
+          <tbody>
+            <tr><th>Agenda</th><td class="y" data-col="r"><i>✓</i>Todas; marca e altera</td><td class="p" data-col="m">A própria</td><td class="p" data-col="p">A própria</td><td class="p" data-col="t">A própria</td><td class="y" data-col="a"><i>✓</i>Todas; marca e altera</td></tr>
+            <tr><th>Pedidos do site</th><td class="y" data-col="r"><i>✓</i>Responde</td><td class="n" data-col="m">—</td><td class="n" data-col="p">—</td><td class="n" data-col="t">—</td><td class="y" data-col="a"><i>✓</i>Responde</td></tr>
+            <tr><th>Cadastro do paciente</th><td class="y" data-col="r"><i>✓</i>Todos</td><td class="p" data-col="m">Os próprios pacientes</td><td class="p" data-col="p">Os próprios pacientes</td><td class="p" data-col="t">Os próprios pacientes</td><td class="y" data-col="a"><i>✓</i>Todos</td></tr>
+            <tr><th>Prontuário: parte compartilhada</th><td class="n" data-col="r">—</td><td class="p" data-col="m">Dos próprios pacientes</td><td class="p" data-col="p">Dos próprios pacientes</td><td class="p" data-col="t">Dos próprios pacientes</td><td class="p" data-col="a">Lê, com auditoria</td></tr>
+            <tr><th>Anotações restritas</th><td class="n" data-col="r">—</td><td class="p" data-col="m">Só as próprias</td><td class="p" data-col="p">Só as próprias</td><td class="p" data-col="t">Só as próprias</td><td class="n" data-col="a">—</td></tr>
+            <tr><th>Documentos</th><td class="p" data-col="r">Sem conteúdo clínico</td><td class="p" data-col="m">Dos próprios pacientes</td><td class="p" data-col="p">Dos próprios pacientes</td><td class="p" data-col="t">Dos próprios pacientes</td><td class="y" data-col="a"><i>✓</i>Todos</td></tr>
+            <tr><th>Financeiro</th><td class="y" data-col="r"><i>✓</i>Registra pagamentos</td><td class="n" data-col="m">—</td><td class="n" data-col="p">—</td><td class="n" data-col="t">—</td><td class="y" data-col="a"><i>✓</i>Todos</td></tr>
+            <tr><th>Painel, usuários e auditoria</th><td class="n" data-col="r">—</td><td class="n" data-col="m">—</td><td class="n" data-col="p">—</td><td class="n" data-col="t">—</td><td class="y" data-col="a"><i>✓</i>Só a administração</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="selo" data-chapter="seguranca" data-title="O selo de integridade">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Segurança e LGPD</p>
+      <h2 class="reveal" style="--d:80">O selo de integridade</h2>
+      <p class="lead reveal" style="--d:160">Ao finalizar, o sistema calcula um selo com uma chave secreta do servidor. Se uma letra mudar, o selo não confere. <strong>Experimente.</strong></p>
+    </header>
+    <div class="body">
+      <div class="seal" data-widget="seal">
+        <div class="seal-record reveal" style="--d:260">
+          <header><strong>Prontuário finalizado</strong><span class="chip sage">exemplo fictício</span></header>
+          <label>Queixa principal<textarea rows="2" data-field>Dor de garganta e coriza há três dias</textarea></label>
+          <label>CID-10<input data-field value="J06.9 · Infecção aguda das vias aéreas superiores"></label>
+          <label>Conduta e plano<textarea rows="2" data-field>Hidratação, repouso e retorno se piorar</textarea></label>
+        </div>
+        <div class="seal-check reveal" style="--d:400">
+          <p>Selo guardado na finalização</p>
+          <code data-stored>…</code>
+          <p>Selo calculado agora</p>
+          <code data-now>…</code>
+          <div class="seal-status" data-status role="status"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-11"/></svg><span>Selo de integridade conferido</span></div>
+          <div class="seal-actions"><button type="button" class="btn" data-tamper>Alterar uma letra</button><button type="button" class="btn ghost" data-restore>Desfazer</button></div>
+        </div>
+      </div>
+      <div class="seal-where reveal" style="--d:600">
+        <span class="chip">Prontuários</span><span class="chip">Adendos</span><span class="chip">Encerramento de processos e tratamentos</span><span class="chip">Documentos emitidos</span><span class="chip sage">HMAC-SHA256 com chave só do servidor</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="privacidade" data-chapter="seguranca" data-title="Privacidade desde o desenho">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Segurança e LGPD</p>
+      <h2 class="reveal" style="--d:80">Privacidade desde o desenho</h2>
+      <p class="lead reveal" style="--d:160">Coletar só o necessário, guardar com cuidado e registrar o acesso.</p>
+    </header>
+    <div class="body">
+      <div class="cards">
+        <article class="card reveal" style="--d:240"><svg viewBox="0 0 34 34"><path d="M9 5h12l6 6v18H9z"/><path d="M21 5v6h6M13 18h10M13 23h7"/></svg><h3>Consentimentos versionados</h3><p>Atendimento, dados, teleatendimento e IA, cada um com a versão aceita. Revogar não apaga o histórico.</p></article>
+        <article class="card reveal" style="--d:300"><svg viewBox="0 0 34 34"><circle cx="17" cy="17" r="12"/><path d="M17 10v7l5 3"/></svg><h3>Pedidos do site expiram</h3><p>Nome, telefone e horário pedido, apagados 90 dias depois de recebidos.</p></article>
+        <article class="card reveal" style="--d:360"><svg viewBox="0 0 34 34"><rect x="6" y="14" width="22" height="15" rx="3"/><path d="M11 14V10a6 6 0 0 1 12 0v4"/></svg><h3>Senhas e sessões</h3><p>Argon2, tentativas limitadas e sessão que termina sozinha: 2 horas sem uso, 12 horas no máximo.</p></article>
+        <article class="card reveal" style="--d:420"><svg viewBox="0 0 34 34"><path d="M5 17h24M17 5c4 4 5 8 5 12s-1 8-5 12M17 5c-4 4-5 8-5 12s1 8 5 12"/><circle cx="17" cy="17" r="12"/></svg><h3>Endereço vira código</h3><p>O IP de quem usa o site é guardado só como código (HMAC), para limitar abusos.</p></article>
+        <article class="card reveal" style="--d:480"><svg viewBox="0 0 34 34"><path d="M7 9h20M7 17h20M7 25h12"/><circle cx="25" cy="25" r="4"/></svg><h3>Auditoria sem conteúdo</h3><p>Registra quem abriu, exportou ou alterou, nunca o que estava escrito.</p></article>
+        <article class="card reveal" style="--d:540"><svg viewBox="0 0 34 34"><rect x="4" y="7" width="26" height="18" rx="3"/><path d="M12 29h10M17 25v4"/></svg><h3>Navegador longe do banco</h3><p>O navegador fala só com o site; o servidor do site fala com a API, a única porta para os dados.</p></article>
+        <article class="card reveal" style="--d:600"><svg viewBox="0 0 34 34"><path d="M17 4l11 5v8c0 7-5 12-11 15-6-3-11-8-11-15V9z"/></svg><h3>Só o próprio domínio</h3><p>A política de segurança do navegador (CSP) só deixa carregar recursos do próprio site. Sem rastreadores.</p></article>
+        <article class="card reveal" style="--d:660"><svg viewBox="0 0 34 34"><path d="M8 17l6 6 12-13"/></svg><h3>Dados fictícios até o portão</h3><p>Paciente real só depois da revisão jurídica, do backup pago e da verificação em duas etapas.</p></article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="arquitetura" data-chapter="seguranca" data-title="Como as peças conversam">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Segurança e LGPD</p>
+      <h2 class="reveal" style="--d:80">Como as peças conversam</h2>
+      <p class="lead reveal" style="--d:160">Cada camada tem um papel. Os dados só passam pela API, que confere quem pede e o que pode ver.</p>
+    </header>
+    <div class="body">
+      <div class="arch">
+        <article class="arch-node" style="--i:0"><span class="chip sage">Quem usa</span><h3>Navegador</h3><ul><li>Computador ou celular</li><li>Site e telas da clínica</li><li>Nunca fala com a API nem com o banco</li></ul></article>
+        <span class="arch-link" style="--i:0"><i></i></span>
+        <article class="arch-node" style="--i:1"><span class="chip">Next.js</span><h3>Site e telas</h3><ul><li>Monta as páginas no servidor</li><li>Sessão em cookie protegido</li><li>Fala com a API com um token próprio</li></ul></article>
+        <span class="arch-link" style="--i:1"><i></i></span>
+        <article class="arch-node dark-node" style="--i:2"><span class="chip">FastAPI</span><h3>API da clínica</h3><ul><li>Permissões de cada perfil</li><li>Selos e auditoria</li><li>Regras da agenda e dos documentos</li></ul></article>
+        <span class="arch-link" style="--i:2"><i></i></span>
+        <article class="arch-node" style="--i:3"><span class="chip">PostgreSQL</span><h3>Banco de dados</h3><ul><li>Dados da clínica</li><li>Recusa horário duplicado</li><li>Backup pago antes dos dados reais</li></ul></article>
+      </div>
+      <p class="flow-rule arch-rule reveal" style="--d:1500">Uma clínica só, sem dados de outras empresas no mesmo banco. Integrações externas (vídeo, IA, assinatura) entram uma a uma, com aprovação.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="qualidade" data-chapter="seguranca" data-title="Testado a cada etapa">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Qualidade</p>
+      <h2 class="reveal" style="--d:80">Testado a cada etapa</h2>
+      <p class="lead reveal" style="--d:160">O sistema foi construído em etapas pequenas, cada uma conferida antes da seguinte.</p>
+    </header>
+    <div class="body">
+      <div class="stats" style="margin-top:0">
+        <div class="stat reveal" style="--d:260"><b data-count="11">11</b><span>etapas entregues, do diagnóstico ao painel</span></div>
+        <div class="stat reveal" style="--d:340"><b data-count="171">171</b><span>testes automáticos na API, com banco de verdade</span></div>
+        <div class="stat reveal" style="--d:420"><b data-count="93">93</b><span>verificações nas telas, como uma pessoa usaria</span></div>
+        <div class="stat reveal" style="--d:500"><b data-count="0">0</b><span>erros no console nas telas verificadas</span></div>
+      </div>
+      <ul class="facts reveal" style="--d:620;margin-top:28px">
+        <li>Antes de cada entrega: revisão de código, verificação de tipos e build de produção.</li>
+        <li>Revisão de segurança por etapa, registrada na documentação do projeto.</li>
+        <li>Telas conferidas no computador e no celular, sem rolagem para os lados.</li>
+        <li>As permissões são testadas perfil por perfil: o que um perfil não deve ver, a API recusa.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================== PRÓXIMOS PASSOS -->
+<section class="slide dark divider" id="cap-proximos" data-chapter="proximos" data-title="Próximos passos" data-summary="O portão para os dados reais, as próximas etapas e o que a clínica decide.">
+  <div class="canvas">
+    <span class="div-num reveal">07</span>
+    <div class="div-text">
+      <p class="eyebrow light reveal" style="--d:120">Capítulo 7</p>
+      <h2 class="reveal" style="--d:220">Próximos passos</h2>
+      <p class="div-lead reveal" style="--d:320">O portão para os dados reais, as próximas etapas e o que a clínica decide.</p>
+    </div>
+    <ol class="div-list" data-chapter-list="proximos"></ol>
+    <img class="div-tree" src="img/brand-tree-mark.webp" alt="" data-overflow-ok>
+  </div>
+</section>
+
+<section class="slide" id="portao" data-chapter="proximos" data-title="Antes dos dados reais">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Próximos passos</p>
+      <h2 class="reveal" style="--d:80">Antes dos dados reais: o portão de produção</h2>
+      <p class="lead reveal" style="--d:160">Até aqui, tudo funciona com dados fictícios. Paciente real só entra depois destes quatro passos.</p>
+    </header>
+    <div class="body">
+      <div class="gate">
+        <article class="card reveal" style="--d:260"><span class="chip">a fazer</span><h3>Revisão jurídica</h3><p>Termos de consentimento, política de privacidade, retenção dos dados e contratos com fornecedores.</p></article>
+        <article class="card reveal" style="--d:340"><span class="chip">a fazer</span><h3>Backup pago e testado</h3><p>Cópias automáticas do banco, com uma restauração conferida antes de começar.</p></article>
+        <article class="card reveal" style="--d:420"><span class="chip">a fazer</span><h3>Verificação em duas etapas</h3><p>Um segundo fator no login de todos os perfis.</p></article>
+        <article class="card reveal" style="--d:500"><span class="chip">a fazer</span><h3>Publicação</h3><p>Site e sistema no ar, com domínio, monitoramento e o agendamento online ligado quando a clínica quiser.</p></article>
+      </div>
+      <p class="note gold reveal" style="--d:640">Enquanto o portão não abre, a demonstração usa só dados fictícios, como os desta apresentação.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="proximas-etapas" data-chapter="proximos" data-title="As próximas etapas">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Próximos passos</p>
+      <h2 class="reveal" style="--d:80">As próximas etapas</h2>
+      <p class="lead reveal" style="--d:160">Já planejadas e prontas para começar quando a clínica escolher os fornecedores.</p>
+    </header>
+    <div class="body">
+      <div class="next3">
+        <article class="card reveal" style="--d:260"><span class="chip">P11</span><h3>Teleatendimento</h3><dl><dt>O que entra</dt><dd>Sala de vídeo por atendimento, link do paciente que expira, consentimento próprio e nada de gravação.</dd><dt>A clínica decide</dt><dd>O fornecedor de vídeo, quais profissões atendem online e a revisão do termo.</dd></dl></article>
+        <article class="card reveal" style="--d:360"><span class="chip">P12</span><h3>Transcrição com apoio de IA</h3><dl><dt>O que entra</dt><dd>Desligada por padrão; o rascunho só entra no prontuário depois de o profissional aprovar, com a marca "apoio de IA".</dd><dt>A clínica decide</dt><dd>Se quer usar, com quais fornecedores e depois da revisão jurídica.</dd></dl></article>
+        <article class="card reveal" style="--d:460"><span class="chip">P13</span><h3>Assinatura digital ICP-Brasil</h3><dl><dt>O que entra</dt><dd>Receita, atestado e documentos assinados digitalmente e verificáveis no ITI.</dd><dt>A clínica decide</dt><dd>O fornecedor do certificado em nuvem, onde guardar os PDFs assinados e o custo.</dd></dl></article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="decisoes" data-chapter="proximos" data-title="Para a clínica confirmar">
+  <div class="canvas">
+    <header class="head">
+      <p class="eyebrow reveal">Próximos passos</p>
+      <h2 class="reveal" style="--d:80">Para a clínica confirmar</h2>
+      <p class="lead reveal" style="--d:160">Escolhas feitas durante o desenvolvimento que dependem da palavra da clínica.</p>
+    </header>
+    <div class="body">
+      <ol class="decisions">
+        <li class="reveal" style="--d:240"><b>1</b><div><strong>Administração e prontuários</strong><span>Hoje a administração lê a parte compartilhada, sempre com registro na auditoria. Manter ou retirar?</span></div></li>
+        <li class="reveal" style="--d:300"><b>2</b><div><strong>Pedidos do site</strong><span>Apagados em 90 dias, com o texto de autorização "site-v1". Confirmar prazo e texto.</span></div></li>
+        <li class="reveal" style="--d:360"><b>3</b><div><strong>Textos-modelo</strong><span>Documentos e mensagens de WhatsApp estão com textos provisórios.</span></div></li>
+        <li class="reveal" style="--d:420"><b>4</b><div><strong>Dados da equipe</strong><span>Registros nos conselhos e quais profissionais aceitam pedidos pelo site.</span></div></li>
+        <li class="reveal" style="--d:480"><b>5</b><div><strong>Agendamento online</strong><span>Quando ligar o agendamento pelo site (hoje desligado, com WhatsApp).</span></div></li>
+        <li class="reveal" style="--d:540"><b>6</b><div><strong>Fornecedores</strong><span>Vídeo, IA e assinatura digital, para as próximas etapas.</span></div></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark end" id="fim" data-chapter="proximos" data-title="Obrigado" data-foot="off">
+  <div class="canvas">
+    <img class="end-logo reveal" src="img/brand-logo.webp" alt="Clínica Kavaná">
+    <h2 class="reveal" style="--d:200">Obrigado.</h2>
+    <p class="reveal" style="--d:340">Perguntas, ajustes e próximos passos: vamos conversar.</p>
+    <span class="chip reveal" style="--d:480">Telas reais · dados fictícios de demonstração</span>
+  </div>
+</section>
+
+</main>
+
+<div id="progress" aria-hidden="true"><i></i></div>
+<nav id="hud" aria-label="Controles da apresentação">
+  <button type="button" data-action="prev" aria-label="Slide anterior"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+  <span id="hud-count">1 / 1</span>
+  <button type="button" data-action="next" aria-label="Próximo slide"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+  <button type="button" data-action="index" aria-label="Índice"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></button>
+  <button type="button" data-action="full" aria-label="Tela cheia"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+  <button type="button" data-action="help" aria-label="Atalhos"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7M12 17h.01"/></svg></button>
+</nav>
+<div class="overlay" id="index" hidden role="dialog" aria-modal="true" aria-label="Índice">
+  <div class="panel"><div class="panel-head"><h2>Índice</h2><button type="button" data-close aria-label="Fechar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div><div class="index-grid"></div></div>
+</div>
+<div class="overlay" id="help" hidden role="dialog" aria-modal="true" aria-label="Atalhos">
+  <div class="panel" style="width:min(820px,100%)"><div class="panel-head"><h2>Atalhos</h2><button type="button" data-close aria-label="Fechar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <ul class="help-list">
+      <li>Avançar <span><kbd>→</kbd> <kbd>espaço</kbd> <kbd>Page Down</kbd></span></li>
+      <li>Voltar <span><kbd>←</kbd> <kbd>Page Up</kbd></span></li>
+      <li>Primeiro e último <span><kbd>Home</kbd> <kbd>End</kbd></span></li>
+      <li>Ir para um slide <span>número + <kbd>Enter</kbd></span></li>
+      <li>Índice <span><kbd>I</kbd> <kbd>Esc</kbd></span></li>
+      <li>Tela cheia <span><kbd>F</kbd></span></li>
+      <li>Repetir os destaques <span><kbd>T</kbd></span></li>
+      <li>Ampliar uma tela <span>clique nela</span></li>
+      <li>Rolar uma tela longa <span>roda do mouse sobre ela</span></li>
+      <li>No celular <span>deslize para os lados</span></li>
+    </ul>
+  </div>
+</div>
+<div class="overlay" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Tela ampliada"><img alt=""><p>Clique ou <kbd>Esc</kbd> para fechar</p></div>
+<div id="rotate" role="status"><span>Gire o celular para ver melhor a apresentação.</span><button type="button">Ok</button></div>
+<p id="live" class="sr-only" aria-live="polite"></p>
+
+<script src="shots.js"></script>
+<script>
+(function () {
+  "use strict";
+  var DATA = window.KAVANA || { shots: {}, texts: {} };
+  var root = document.documentElement;
+  var deck = document.getElementById("deck");
+  var slides = Array.prototype.slice.call(deck.querySelectorAll(".slide"));
+  var total = slides.length;
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var CHAPTERS = { inicio: "Visão geral", site: "Site", recepcao: "Recepção", medica: "Médica", terapias: "Psicologia e terapias", gestao: "Administração", seguranca: "Segurança", proximos: "Próximos passos" };
+  var current = -1;
+  var timers = {};
+  var enterHooks = new Map();
+  var leaveHooks = new Map();
+
+  function $(selector, scope) { return (scope || document).querySelector(selector); }
+  function $$(selector, scope) { return Array.prototype.slice.call((scope || document).querySelectorAll(selector)); }
+  function el(tag, className, text) {
+    var node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text != null) node.textContent = text;
+    return node;
+  }
+  function pct(value) { return (value * 100).toFixed(3) + "%"; }
+  function slideOf(node) { return node.closest(".slide"); }
+  function key(slide, channel) { return slides.indexOf(slide) + ":" + channel; }
+  function later(slide, channel, fn, ms) {
+    var id = setTimeout(fn, reduce ? 0 : ms);
+    (timers[key(slide, channel)] = timers[key(slide, channel)] || []).push(id);
+  }
+  function clear(slide, channel) {
+    Object.keys(timers).forEach(function (name) {
+      if (name.indexOf(slides.indexOf(slide) + ":") === 0 && (!channel || name === key(slide, channel))) {
+        timers[name].forEach(clearTimeout);
+        delete timers[name];
+      }
+    });
+  }
+  function onEnter(slide, fn) { if (!enterHooks.has(slide)) enterHooks.set(slide, []); enterHooks.get(slide).push(fn); }
+  function onLeave(slide, fn) { if (!leaveHooks.has(slide)) leaveHooks.set(slide, []); leaveHooks.get(slide).push(fn); }
+
+  // ---------- Capítulos, rodapés e índices ----------
+  var chapterOrder = [];
+  slides.forEach(function (slide, index) {
+    var chapter = slide.dataset.chapter;
+    if (chapterOrder.indexOf(chapter) < 0) chapterOrder.push(chapter);
+    slide.setAttribute("role", "group");
+    slide.setAttribute("aria-roledescription", "slide");
+    slide.setAttribute("aria-label", (index + 1) + " de " + total + ": " + slide.dataset.title);
+  });
+  function firstOf(chapter) {
+    var divider = slides.findIndex(function (slide) { return slide.dataset.chapter === chapter && slide.classList.contains("divider"); });
+    return divider >= 0 ? divider : slides.findIndex(function (slide) { return slide.dataset.chapter === chapter; });
+  }
+  function goButton(className, label, target) {
+    var button = el("button", className);
+    button.type = "button";
+    if (label != null) button.textContent = label;
+    button.addEventListener("click", function (event) { event.stopPropagation(); closeOverlays(); show(target); });
+    return button;
+  }
+  slides.forEach(function (slide, index) {
+    if (slide.dataset.foot === "off") return;
+    var foot = el("footer", "foot");
+    var brand = el("span", "foot-brand");
+    var tree = el("img");
+    tree.src = "img/brand-tree-mark.webp";
+    tree.alt = "";
+    brand.append(tree, "Clínica Kavaná");
+    var nav = el("nav", "foot-chapters");
+    nav.setAttribute("aria-label", "Capítulos");
+    chapterOrder.forEach(function (chapter) {
+      nav.append(goButton(chapter === slide.dataset.chapter ? "on" : "", CHAPTERS[chapter], firstOf(chapter)));
+    });
+    foot.append(brand, nav, el("span", "foot-page", (index + 1) + " / " + total));
+    $(".canvas", slide).append(foot);
+  });
+  $$("[data-chapter-list]").forEach(function (list) {
+    slides.forEach(function (slide, index) {
+      if (slide.dataset.chapter !== list.dataset.chapterList || slide.classList.contains("divider")) return;
+      var item = el("li", "reveal");
+      item.style.setProperty("--d", 300 + list.children.length * 70);
+      var button = goButton("", null, index);
+      button.append(el("span", null, String(index + 1)), el("strong", null, slide.dataset.title));
+      button.querySelector("strong").style.fontWeight = "500";
+      button.insertAdjacentHTML("beforeend", '<svg viewBox="0 0 16 16"><path d="M5 3l5 5-5 5"/></svg>');
+      item.append(button);
+      list.append(item);
+    });
+  });
+  $$("[data-chapter-cards]").forEach(function (grid) {
+    chapterOrder.forEach(function (chapter, order) {
+      var first = firstOf(chapter);
+      var count = slides.filter(function (slide) { return slide.dataset.chapter === chapter; }).length;
+      var card = goButton("chapter-card reveal" + (chapter === "inicio" ? " intro" : ""), null, chapter === "inicio" ? 2 : first);
+      card.style.setProperty("--d", 240 + order * 80);
+      var summary = chapter === "inicio" ? "Os pilares do sistema, o fluxo de um atendimento e os perfis de acesso." : slides[first].dataset.summary;
+      card.append(el("span", "num", chapter === "inicio" ? "00" : String(order).padStart(2, "0")), el("h3", null, chapter === "inicio" ? "Visão geral" : slides[first].dataset.title), el("p", null, summary), el("small", null, count + " slides"));
+      grid.append(card);
+    });
+  });
+
+  // ---------- Telas: moldura, destaques, rolagem e ampliação ----------
+  function bar(path) {
+    var head = el("div", "shot-bar");
+    head.append(el("i"), el("i"), el("i"));
+    var address = el("span");
+    address.innerHTML = '<svg viewBox="0 0 12 12"><rect x="2.5" y="5.5" width="7" height="5" rx="1"/><path d="M4 5.5V4a2 2 0 0 1 4 0v1.5"/></svg>';
+    address.append(path || "kavana");
+    head.append(address);
+    return head;
+  }
+  function buildShot(figure) {
+    var name = figure.dataset.shot;
+    var meta = DATA.shots[name];
+    if (!meta) {
+      figure.append(el("p", "missing-text", "Tela “" + name + "” ainda não capturada: rode build.mjs."));
+      return;
+    }
+    var frame = (figure.dataset.frame || meta.w + "/" + meta.h).split("/").map(Number);
+    var view = el("div", "shot-view");
+    view.style.aspectRatio = frame[0] + " / " + frame[1];
+    var stage = el("div", "shot-stage");
+    stage.style.aspectRatio = meta.w + " / " + meta.h;
+    var image = el("img");
+    image.src = "img/" + name + ".webp";
+    image.alt = figure.dataset.alt || "";
+    image.draggable = false;
+    image.decoding = "async";
+    stage.append(image);
+    if (figure.dataset.marks !== "none") {
+      Object.keys(meta.marks).forEach(function (mark) {
+        var box = meta.marks[mark];
+        var node = el("span", "mark");
+        node.dataset.mark = mark;
+        node.style.left = pct(box[0]);
+        node.style.top = pct(box[1]);
+        node.style.width = pct(box[2]);
+        node.style.height = pct(box[3]);
+        // Na borda esquerda da tela, o número vai para o canto direito (ou para a borda de cima,
+        // se a caixa ocupa a largura toda); colado no topo, desce para dentro da moldura.
+        if (box[0] * meta.w < 20) node.classList.add(box[0] + box[2] < 0.9 ? "badge-right" : "badge-top");
+        if (box[1] * meta.h < 18) node.classList.add("badge-low");
+        node.append(el("b"));
+        stage.append(node);
+      });
+    }
+    view.append(stage);
+    if (!figure.classList.contains("phone") && !figure.classList.contains("bare")) figure.append(bar(figure.dataset.path));
+    figure.append(view);
+    figure.classList.toggle("tall", meta.h / meta.w > frame[1] / frame[0] + 0.02);
+    view.addEventListener("click", function (event) {
+      if (event.target.closest(".mark")) return;
+      event.stopPropagation();
+      openLightbox(figure);
+    });
+    view.addEventListener("wheel", function (event) {
+      if (!figure.classList.contains("tall")) return;
+      event.preventDefault();
+      event.stopPropagation();
+      stopTour(slideOf(figure));
+      stopDrift(figure);
+      panTo(figure, null, Number(figure.dataset.y || 0) + event.deltaY * 0.7, true);
+    }, { passive: false });
+  }
+  function panTo(figure, mark, y, quick) {
+    var view = $(".shot-view", figure);
+    var stage = $(".shot-stage", figure);
+    var max = Math.max(0, stage.clientHeight - view.clientHeight);
+    if (mark) y = mark.offsetTop + mark.offsetHeight / 2 - view.clientHeight / 2;
+    y = Math.max(0, Math.min(max, y || 0));
+    figure.dataset.y = y;
+    stage.style.transition = quick ? "transform .25s ease-out" : "";
+    stage.style.transform = "translateY(" + -y + "px)";
+  }
+  function startDrift(figure) {
+    var view = $(".shot-view", figure);
+    var stage = $(".shot-stage", figure);
+    var max = stage.clientHeight - view.clientHeight;
+    if (max < 40 || reduce) return;
+    stage.style.setProperty("--drift", -max + "px");
+    stage.style.setProperty("--drift-time", Math.max(9, max / 85) + "s");
+    figure.classList.add("drift");
+  }
+  function stopDrift(figure) {
+    if (!figure.classList.contains("drift")) return;
+    var stage = $(".shot-stage", figure);
+    var matrix = new DOMMatrix(getComputedStyle(stage).transform);
+    figure.classList.remove("drift");
+    figure.dataset.y = -matrix.m42;
+    stage.style.transition = "none";
+    stage.style.transform = "translateY(" + matrix.m42 + "px)";
+  }
+  $$(".shot[data-shot]").forEach(buildShot);
+
+  // Legendas numeradas na ordem do slide; os destaques ganham o mesmo número.
+  slides.forEach(function (slide) {
+    var number = 0;
+    $$(".legend li", slide).forEach(function (item, order) {
+      number += 1;
+      item.prepend(el("b", null, String(number)));
+      item.classList.add("reveal");
+      if (!item.style.getPropertyValue("--d")) item.style.setProperty("--d", 300 + order * 90);
+      if (!item.dataset.mark) return;
+      var figure = item.dataset.shot ? $('.shot[data-shot="' + item.dataset.shot + '"]', slide) : $(".shot[data-shot]", slide);
+      var mark = figure && $('.mark[data-mark="' + item.dataset.mark + '"]', figure);
+      if (!mark) return;
+      mark.dataset.n = String(number);
+      $("b", mark).textContent = String(number);
+      item.dataset.n = String(number);
+      item.dataset.placed = "1";
+      item.tabIndex = 0;
+      var on = function () { stopTour(slide); activate(slide, item); };
+      var off = function () { activate(slide, null, true); };
+      item.addEventListener("mouseenter", on);
+      item.addEventListener("focus", on);
+      item.addEventListener("mouseleave", off);
+      item.addEventListener("blur", off);
+      item.addEventListener("click", function (event) { event.stopPropagation(); on(); });
+      mark.addEventListener("mouseenter", on);
+      mark.addEventListener("mouseleave", off);
+      mark.addEventListener("click", function (event) { event.stopPropagation(); on(); });
+    });
+    $$(".mark", slide).forEach(function (mark) { if (!mark.dataset.n) mark.remove(); });
+  });
+  function activate(slide, item, keepPan) {
+    $$(".mark.on, .legend li.on", slide).forEach(function (node) { node.classList.remove("on"); });
+    if (!item) return;
+    item.classList.add("on");
+    var mark = $('.mark[data-n="' + item.dataset.n + '"]', slide);
+    if (!mark) return;
+    mark.classList.add("on", "shown");
+    var figure = mark.closest(".shot");
+    if (!keepPan && figure.classList.contains("tall")) { stopDrift(figure); panTo(figure, mark); }
+  }
+  function startTour(slide) {
+    var marks = $$(".mark", slide);
+    var items = $$(".legend li[data-placed]", slide);
+    marks.forEach(function (mark, order) { later(slide, "tour", function () { mark.classList.add("shown"); }, 1000 + order * 150); });
+    if (reduce || !items.length) return;
+    var at = 1500 + marks.length * 150;
+    items.forEach(function (item) {
+      later(slide, "tour", function () { activate(slide, item); }, at);
+      at += 2200;
+    });
+    later(slide, "tour", function () {
+      activate(slide, null);
+      $$(".shot.tall", slide).forEach(function (figure) { panTo(figure, null, 0); });
+    }, at);
+  }
+  function stopTour(slide) {
+    clear(slide, "tour");
+    $$(".mark", slide).forEach(function (mark) { mark.classList.add("shown"); });
+  }
+  slides.forEach(function (slide) {
+    onEnter(slide, function () {
+      startTour(slide);
+      $$(".shot.tall", slide).forEach(function (figure) {
+        if (!$(".mark", figure)) later(slide, "drift", function () { startDrift(figure); }, 600);
+      });
+    });
+    onLeave(slide, function () {
+      activate(slide, null);
+      $$(".mark", slide).forEach(function (mark) { mark.classList.remove("shown"); });
+      $$(".shot.tall", slide).forEach(function (figure) {
+        figure.classList.remove("drift");
+        var stage = $(".shot-stage", figure);
+        stage.style.transition = "none";
+        stage.style.transform = "";
+        figure.dataset.y = 0;
+      });
+    });
+  });
+
+  // ---------- Peças interativas ----------
+  function autoSwitch(slide, widget, states, apply, every) {
+    var position = 0;
+    var auto = true;
+    function step() {
+      if (!auto) return;
+      later(slide, "widget", function () { position = (position + 1) % states.length; apply(states[position]); step(); }, every);
+    }
+    onEnter(slide, function () { position = 0; auto = !reduce; apply(states[0]); step(); });
+    onLeave(slide, function () { auto = false; });
+    return {
+      stop: function () { auto = false; clear(slide, "widget"); },
+      at: function (state) { position = Math.max(0, states.indexOf(state)); }
+    };
+  }
+  function swapTo(widget, state) {
+    widget.dataset.state = state;
+    $$("[data-state-view]", widget).forEach(function (figure) { figure.classList.toggle("current", figure.dataset.stateView === state); });
+  }
+  $$('[data-widget="stepper"]').forEach(function (widget) {
+    var slide = slideOf(widget);
+    var tabs = $$("[data-step]", widget);
+    var figures = $$(".swap > .shot", widget);
+    function select(index) {
+      tabs.forEach(function (tab, position) { tab.classList.toggle("on", position === index); tab.setAttribute("aria-pressed", position === index ? "true" : "false"); });
+      figures.forEach(function (figure, position) { figure.classList.toggle("current", position === index); });
+    }
+    var control = autoSwitch(slide, widget, [0, 1, 2, 3, 4, 5], select, 2800);
+    onEnter(slide, function () { widget.classList.toggle("auto", !reduce); });
+    tabs.forEach(function (tab, index) {
+      tab.addEventListener("click", function (event) { event.stopPropagation(); control.stop(); widget.classList.remove("auto"); select(index); });
+    });
+  });
+  $$('[data-widget="toggle"]').forEach(function (widget) {
+    var slide = slideOf(widget);
+    var button = $(".switch", widget);
+    function apply(state) { swapTo(widget, state); button.setAttribute("aria-checked", state === "on" ? "true" : "false"); }
+    var control = autoSwitch(slide, widget, ["on", "off"], apply, 3600);
+    button.addEventListener("click", function (event) {
+      event.stopPropagation();
+      control.stop();
+      apply(widget.dataset.state === "on" ? "off" : "on");
+    });
+  });
+  $$('[data-widget="viewas"]').forEach(function (widget) {
+    var slide = slideOf(widget);
+    var buttons = $$("[data-set]", widget);
+    function apply(state) {
+      swapTo(widget, state);
+      buttons.forEach(function (button) { button.setAttribute("aria-pressed", button.dataset.set === state ? "true" : "false"); });
+      var restricted = $('.mark[data-n]', $('[data-state-view="author"]', widget));
+      if (restricted) restricted.classList.toggle("on", state === "author");
+    }
+    var control = autoSwitch(slide, widget, ["author", "admin"], apply, 3800);
+    buttons.forEach(function (button) {
+      button.addEventListener("click", function (event) { event.stopPropagation(); control.stop(); apply(button.dataset.set); });
+    });
+  });
+  $$('[data-widget="viewas"] [data-state-view="author"]').forEach(function (figure) {
+    // O destaque do registro restrito acompanha a visão da autora (sem legenda própria).
+    var meta = DATA.shots[figure.dataset.shot];
+    var stage = $(".shot-stage", figure);
+    if (!meta || !meta.marks["1"] || !stage) return;
+    var box = meta.marks["1"];
+    var node = el("span", "mark shown");
+    node.dataset.n = "1";
+    node.style.left = pct(box[0]);
+    node.style.top = pct(box[1]);
+    node.style.width = pct(box[2]);
+    node.style.height = pct(box[3]);
+    node.append(el("b", null, "!"));
+    stage.append(node);
+  });
+  $$('[data-widget="matrix"]').forEach(function (widget) {
+    var slide = slideOf(widget);
+    var buttons = $$("[data-set]", widget);
+    function apply(role) {
+      widget.dataset.role = role;
+      $$("[data-col]", widget).forEach(function (cell) { cell.classList.toggle("sel", cell.dataset.col === role); });
+      buttons.forEach(function (button) { button.setAttribute("aria-pressed", button.dataset.set === role ? "true" : "false"); });
+    }
+    var control = autoSwitch(slide, widget, ["all", "r", "m", "p", "t", "a", "all"], apply, 2600);
+    buttons.forEach(function (button) {
+      button.addEventListener("click", function (event) { event.stopPropagation(); control.stop(); apply(button.dataset.set); });
+    });
+  });
+  $$('[data-widget="chat"]').forEach(function (widget) {
+    var slide = slideOf(widget);
+    var bubbles = $$("[data-text]", widget);
+    bubbles.forEach(function (bubble) { bubble.textContent = DATA.texts[bubble.dataset.text] || ""; });
+    onEnter(slide, function () {
+      if (reduce) return;
+      bubbles.forEach(function (bubble, order) {
+        var text = DATA.texts[bubble.dataset.text] || "";
+        bubble.textContent = "";
+        bubble.classList.add("typing");
+        var position = 0;
+        function type() {
+          position += 2;
+          bubble.textContent = text.slice(0, position);
+          if (position < text.length) later(slide, "type", type, 22);
+          else bubble.classList.remove("typing");
+        }
+        later(slide, "type", type, 900 + order * 1500);
+      });
+    });
+    onLeave(slide, function () {
+      bubbles.forEach(function (bubble) { bubble.classList.remove("typing"); bubble.textContent = DATA.texts[bubble.dataset.text] || ""; });
+    });
+  });
+  $$("[data-count]").forEach(function (node) {
+    var slide = slideOf(node);
+    var target = Number(node.dataset.count);
+    var format = new Intl.NumberFormat("pt-BR");
+    onEnter(slide, function () {
+      if (reduce) return;
+      var start = performance.now();
+      node.textContent = "0";
+      later(slide, "count", function tick() {
+        var progress = Math.min(1, (performance.now() - start - 500) / 1400);
+        node.textContent = format.format(Math.round(target * (1 - Math.pow(1 - Math.max(progress, 0), 3))));
+        if (progress < 1 && slide.classList.contains("active")) requestAnimationFrame(tick);
+        else node.textContent = format.format(target);
+      }, 500);
+    });
+  });
+  $$(".flow-steps li[data-go]").forEach(function (step) {
+    function go(event) {
+      event.stopPropagation();
+      show(slides.findIndex(function (slide) { return slide.id === step.dataset.go; }));
+    }
+    step.addEventListener("click", go);
+    step.addEventListener("keydown", function (event) { if (event.key === "Enter" || event.key === " ") go(event); });
+  });
+
+  // Selo de integridade: HMAC-SHA256 de verdade, com uma chave só desta demonstração.
+  var K = [0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5, 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da, 0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967, 0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85, 0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070, 0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3, 0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2];
+  function sha256(data) {
+    var hash = new Uint32Array([0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19]);
+    var length = data.length;
+    var padded = new Uint8Array(((length + 9 + 63) >> 6) << 6);
+    padded.set(data);
+    padded[length] = 0x80;
+    var view = new DataView(padded.buffer);
+    view.setUint32(padded.length - 4, length * 8);
+    var w = new Uint32Array(64);
+    for (var offset = 0; offset < padded.length; offset += 64) {
+      for (var t = 0; t < 16; t++) w[t] = view.getUint32(offset + t * 4);
+      for (t = 16; t < 64; t++) {
+        var x = w[t - 15], y = w[t - 2];
+        w[t] = w[t - 16] + ((x >>> 7 | x << 25) ^ (x >>> 18 | x << 14) ^ (x >>> 3)) + w[t - 7] + ((y >>> 17 | y << 15) ^ (y >>> 19 | y << 13) ^ (y >>> 10));
+      }
+      var a = hash[0], b = hash[1], c = hash[2], d = hash[3], e = hash[4], f = hash[5], g = hash[6], h = hash[7];
+      for (t = 0; t < 64; t++) {
+        var t1 = (h + ((e >>> 6 | e << 26) ^ (e >>> 11 | e << 21) ^ (e >>> 25 | e << 7)) + ((e & f) ^ (~e & g)) + K[t] + w[t]) | 0;
+        var t2 = (((a >>> 2 | a << 30) ^ (a >>> 13 | a << 19) ^ (a >>> 22 | a << 10)) + ((a & b) ^ (a & c) ^ (b & c))) | 0;
+        h = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0;
+      }
+      hash[0] += a; hash[1] += b; hash[2] += c; hash[3] += d; hash[4] += e; hash[5] += f; hash[6] += g; hash[7] += h;
+    }
+    var out = new Uint8Array(32);
+    var outView = new DataView(out.buffer);
+    for (var i = 0; i < 8; i++) outView.setUint32(i * 4, hash[i]);
+    return out;
+  }
+  function hmacHex(keyText, message) {
+    var encoder = new TextEncoder();
+    var keyBytes = encoder.encode(keyText);
+    if (keyBytes.length > 64) keyBytes = sha256(keyBytes);
+    var block = new Uint8Array(64);
+    block.set(keyBytes);
+    var inner = new Uint8Array(64 + encoder.encode(message).length);
+    var outer = new Uint8Array(96);
+    for (var i = 0; i < 64; i++) { inner[i] = block[i] ^ 0x36; outer[i] = block[i] ^ 0x5c; }
+    inner.set(encoder.encode(message), 64);
+    outer.set(sha256(inner), 64);
+    return Array.prototype.map.call(sha256(outer), function (byte) { return byte.toString(16).padStart(2, "0"); }).join("");
+  }
+  window.KavanaDeck = { hmacHex: hmacHex };
+  $$('[data-widget="seal"]').forEach(function (widget) {
+    var slide = slideOf(widget);
+    var fields = $$("[data-field]", widget);
+    var original = fields.map(function (field) { return field.value; });
+    var demoKey = "chave-de-demonstracao-kavana";
+    var seal = function () { return hmacHex(demoKey, JSON.stringify(fields.map(function (field) { return field.value; }))); };
+    var stored = hmacHex(demoKey, JSON.stringify(original));
+    var storedNode = $("[data-stored]", widget);
+    var nowNode = $("[data-now]", widget);
+    var status = $("[data-status]", widget);
+    var label = $("span", status);
+    var icon = $("svg path", status);
+    function group(hex) { return hex.slice(0, 40).replace(/(.{4})/g, "$1 ").trim() + " …"; }
+    function check() {
+      var now = seal();
+      var ok = now === stored;
+      nowNode.textContent = group(now);
+      nowNode.classList.toggle("diff", !ok);
+      if (status.classList.contains("bad") !== !ok) {
+        status.classList.toggle("bad", !ok);
+        label.textContent = ok ? "Selo de integridade conferido" : "Selo não confere: o conteúdo mudou";
+        icon.setAttribute("d", ok ? "M5 12l5 5 9-11" : "M6 6l12 12M18 6L6 18");
+      }
+    }
+    storedNode.textContent = group(stored);
+    fields.forEach(function (field) { field.addEventListener("input", check); });
+    $("[data-tamper]", widget).addEventListener("click", function (event) {
+      event.stopPropagation();
+      var field = fields[0];
+      field.value = field.value.indexOf("três") >= 0 ? field.value.replace("três", "dois") : field.value + ".";
+      field.focus();
+      check();
+    });
+    $("[data-restore]", widget).addEventListener("click", function (event) {
+      event.stopPropagation();
+      fields.forEach(function (field, index) { field.value = original[index]; });
+      check();
+    });
+    onLeave(slide, function () { fields.forEach(function (field, index) { field.value = original[index]; }); check(); });
+    check();
+  });
+
+  // ---------- Ampliação, índice e ajuda ----------
+  var lightbox = $("#lightbox");
+  var indexPanel = $("#index");
+  var helpPanel = $("#help");
+  function openOverlay(overlay) {
+    closeOverlays();
+    overlay.hidden = false;
+    requestAnimationFrame(function () { overlay.classList.add("open"); });
+    var focus = $("[data-close]", overlay) || overlay;
+    focus.focus({ preventScroll: true });
+  }
+  function closeOverlays() {
+    $$(".overlay").forEach(function (overlay) {
+      if (overlay.hidden) return;
+      overlay.classList.remove("open");
+      setTimeout(function () { overlay.hidden = true; }, 260);
+    });
+  }
+  function overlayOpen() { return $$(".overlay").some(function (overlay) { return !overlay.hidden; }); }
+  function openLightbox(figure) {
+    var source = $(".shot-stage img", figure);
+    var meta = DATA.shots[figure.dataset.shot] || { w: 1, h: 1 };
+    var image = $("img", lightbox);
+    image.src = source.src;
+    image.alt = source.alt;
+    lightbox.classList.toggle("fit-height", meta.h / meta.w < 1.25);
+    lightbox.tabIndex = -1;
+    openOverlay(lightbox);
+    lightbox.scrollTop = 0;
+  }
+  lightbox.addEventListener("click", closeOverlays);
+  $$(".overlay [data-close]").forEach(function (button) { button.addEventListener("click", closeOverlays); });
+  $$(".overlay").forEach(function (overlay) {
+    overlay.addEventListener("click", function (event) { if (event.target === overlay) closeOverlays(); });
+  });
+  var indexGrid = $(".index-grid", indexPanel);
+  chapterOrder.forEach(function (chapter) {
+    var column = el("section");
+    column.append(el("h3", null, CHAPTERS[chapter]));
+    var list = el("ol");
+    slides.forEach(function (slide, index) {
+      if (slide.dataset.chapter !== chapter) return;
+      var item = el("li");
+      var button = goButton("", null, index);
+      button.dataset.index = String(index);
+      button.append(el("span", null, String(index + 1)), document.createTextNode(slide.dataset.title));
+      item.append(button);
+      list.append(item);
+    });
+    column.append(list);
+    indexGrid.append(column);
+  });
+  function toggleIndex() {
+    if (!indexPanel.hidden) return closeOverlays();
+    $$("button", indexGrid).forEach(function (button) { button.classList.toggle("current", Number(button.dataset.index) === current); });
+    openOverlay(indexPanel);
+  }
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) { if (root.requestFullscreen) root.requestFullscreen().catch(function () {}); }
+    else if (document.exitFullscreen) document.exitFullscreen();
+  }
+
+  // ---------- Navegação ----------
+  var hudCount = $("#hud-count");
+  var progress = $("#progress i");
+  var live = $("#live");
+  function enter(slide) { (enterHooks.get(slide) || []).forEach(function (fn) { fn(); }); }
+  function leave(slide) { clear(slide); (leaveHooks.get(slide) || []).forEach(function (fn) { fn(); }); }
+  function show(index) {
+    index = Math.max(0, Math.min(total - 1, index));
+    if (index === current || index < 0) return;
+    var previous = slides[current];
+    var next = slides[index];
+    root.style.setProperty("--dir", current < 0 || index > current ? 1 : -1);
+    if (previous) {
+      previous.classList.remove("active");
+      previous.classList.add("leaving");
+      previous.setAttribute("aria-hidden", "true");
+      previous.inert = true;
+      leave(previous);
+      setTimeout(function () { previous.classList.remove("leaving"); }, 620);
+    }
+    next.classList.remove("leaving");
+    next.classList.add("active");
+    next.removeAttribute("aria-hidden");
+    next.inert = false;
+    current = index;
+    enter(next);
+    hudCount.textContent = (index + 1) + " / " + total;
+    progress.style.width = ((index + 1) / total * 100) + "%";
+    live.textContent = "Slide " + (index + 1) + " de " + total + ": " + next.dataset.title;
+    if (history.replaceState) history.replaceState(null, "", "#" + (index + 1));
+  }
+  slides.forEach(function (slide) { slide.setAttribute("aria-hidden", "true"); slide.inert = true; });
+  function fromHash() {
+    var hash = decodeURIComponent(location.hash.slice(1));
+    if (/^\d+$/.test(hash)) return Number(hash) - 1;
+    var found = slides.findIndex(function (slide) { return slide.id === hash; });
+    return found >= 0 ? found : 0;
+  }
+  var typed = "";
+  document.addEventListener("keydown", function (event) {
+    if (event.altKey || event.ctrlKey || event.metaKey) return;
+    if (event.target.closest("input, textarea")) { if (event.key === "Escape") event.target.blur(); return; }
+    if (overlayOpen()) { if (event.key === "Escape") closeOverlays(); return; }
+    var onControl = event.target.closest("button, [tabindex]");
+    if (/^\d$/.test(event.key)) { typed += event.key; return; }
+    switch (event.key) {
+      case "Enter":
+        if (typed) { show(Number(typed) - 1); typed = ""; event.preventDefault(); return; }
+        if (onControl) return;
+        show(current + 1); break;
+      case " ":
+        if (onControl) return;
+        event.preventDefault();
+        show(current + (event.shiftKey ? -1 : 1)); break;
+      case "ArrowRight": case "PageDown": case "ArrowDown": event.preventDefault(); show(current + 1); break;
+      case "ArrowLeft": case "PageUp": case "ArrowUp": event.preventDefault(); show(current - 1); break;
+      case "Home": show(0); break;
+      case "End": show(total - 1); break;
+      case "i": case "I": case "g": case "G": case "Escape": toggleIndex(); break;
+      case "f": case "F": toggleFullscreen(); break;
+      case "?": case "h": case "H": openOverlay(helpPanel); break;
+      case "t": case "T": var slide = slides[current]; stopTour(slide); $$(".mark", slide).forEach(function (mark) { mark.classList.remove("shown"); }); startTour(slide); break;
+      default: return;
+    }
+    typed = "";
+  });
+  deck.addEventListener("click", function (event) {
+    if (event.target.closest("a, button, input, textarea, label, .shot, .legend li, [data-widget], .chapter-card, .flow-steps li, .chat")) return;
+    show(current + (event.clientX < window.innerWidth * 0.18 ? -1 : 1));
+  });
+  var touchX = null;
+  var touchY = null;
+  deck.addEventListener("touchstart", function (event) { touchX = event.changedTouches[0].clientX; touchY = event.changedTouches[0].clientY; }, { passive: true });
+  deck.addEventListener("touchend", function (event) {
+    if (touchX === null) return;
+    var dx = event.changedTouches[0].clientX - touchX;
+    var dy = event.changedTouches[0].clientY - touchY;
+    touchX = null;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) show(current + (dx < 0 ? 1 : -1));
+  }, { passive: true });
+  $$("#hud [data-action]").forEach(function (button) {
+    button.addEventListener("click", function (event) {
+      event.stopPropagation();
+      var action = button.dataset.action;
+      if (action === "prev") show(current - 1);
+      if (action === "next") show(current + 1);
+      if (action === "index") toggleIndex();
+      if (action === "full") toggleFullscreen();
+      if (action === "help") openOverlay(helpPanel);
+    });
+  });
+  var hudTimer = null;
+  document.addEventListener("mousemove", function () {
+    document.body.classList.add("hud");
+    clearTimeout(hudTimer);
+    hudTimer = setTimeout(function () { document.body.classList.remove("hud"); }, 2600);
+  });
+  var rotate = $("#rotate");
+  $("button", rotate).addEventListener("click", function () { rotate.classList.remove("show"); });
+  function fit() {
+    root.style.setProperty("--s", Math.min(window.innerWidth / 1485, window.innerHeight / 1050));
+    rotate.classList.toggle("show", window.innerWidth < 760 && window.innerHeight > window.innerWidth);
+  }
+  window.addEventListener("resize", fit);
+  window.addEventListener("hashchange", function () { show(fromHash()); });
+  fit();
+  show(fromHash());
+})();
+</script>
+</body>
+</html>
